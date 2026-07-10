@@ -42,7 +42,7 @@ export default async function OwnerDetailPage({ params }: { params: Promise<{ id
     <div>
       <OwnerInfoCard owner={ownerRow} />
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-display text-xl font-semibold text-ink">
           Tòa nhà ({buildingsWithUnits.length})
         </h2>

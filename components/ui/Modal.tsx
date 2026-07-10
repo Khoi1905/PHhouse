@@ -17,8 +17,8 @@ export function Modal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
-      <div className="max-h-full w-full max-w-xl overflow-y-auto rounded-card border border-line bg-white p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3 py-4 sm:px-4 sm:py-8">
+      <div className="max-h-full w-full max-w-xl overflow-y-auto rounded-card border border-line bg-white p-4 sm:p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold text-ink">{title}</h2>
           <button onClick={onClose} className="rounded-full p-1.5 text-muted hover:bg-paper hover:text-ink">

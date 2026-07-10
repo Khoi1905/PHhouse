@@ -18,8 +18,8 @@ export function SectionCard({
 }) {
   return (
     <div
-      className={`relative mb-4 rounded-card border-[1.5px] border-line ${SHADES[depth]} p-6`}
-      style={{ marginLeft: depth * 18 }}
+      className={`relative mb-4 rounded-card border-[1.5px] border-line ${SHADES[depth]} p-4 sm:p-6`}
+      style={{ marginLeft: depth * 12 }}
     >
       <div className="mb-[18px] flex items-start gap-3">
         <div className="mt-px flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[9px] bg-moss text-paper">

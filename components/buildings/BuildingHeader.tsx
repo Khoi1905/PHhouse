@@ -70,14 +70,14 @@ export function BuildingHeader({ data, isAdmin }: { data: BuildingHeaderData; is
   const addressLine = [data.district, data.ward, data.alley].filter(Boolean).join(", ");
 
   return (
-    <div className="mb-6 rounded-card border-[1.5px] border-line bg-white p-6">
+    <div className="mb-6 rounded-card border-[1.5px] border-line bg-white p-4 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[9px] bg-moss text-paper">
             <Building2 size={18} strokeWidth={2.2} />
           </div>
           <div>
-            <h1 className="font-display text-2xl font-bold text-ink">{addressLine}</h1>
+            <h1 className="font-display text-xl font-bold text-ink sm:text-2xl">{addressLine}</h1>
             {isAdmin && (
               <p className="mt-1 flex items-center gap-1.5 text-sm text-sale-lock">
                 <Lock size={12} />

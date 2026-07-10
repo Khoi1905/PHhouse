@@ -42,14 +42,14 @@ export function OwnerInfoCard({ owner }: { owner: OwnerRow }) {
   }
 
   return (
-    <div className="mb-6 rounded-card border-[1.5px] border-line bg-white p-6">
+    <div className="mb-6 rounded-card border-[1.5px] border-line bg-white p-4 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[9px] bg-moss text-paper">
             <User size={18} strokeWidth={2.2} />
           </div>
           <div>
-            <h1 className="font-display text-2xl font-bold text-ink">{owner.full_name}</h1>
+            <h1 className="font-display text-xl font-bold text-ink sm:text-2xl">{owner.full_name}</h1>
             <p className="mt-1 text-sm text-muted-2">
               Mã chủ: <span className="font-semibold text-ink">{owner.owner_code}</span> · {owner.phone}
               {owner.phone_secondary ? ` / ${owner.phone_secondary}` : ""}

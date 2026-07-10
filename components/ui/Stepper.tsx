@@ -24,12 +24,12 @@ export function Stepper({
               type="button"
               disabled={!clickable}
               onClick={() => clickable && onStepClick?.(i)}
-              className={`flex items-center gap-[7px] whitespace-nowrap bg-transparent py-1.5 font-sans text-[13px] font-semibold ${
+              className={`flex items-center gap-1 whitespace-nowrap bg-transparent py-1.5 font-sans text-xs font-semibold sm:gap-[7px] sm:text-[13px] ${
                 isActive || isDone ? "text-ink" : "text-placeholder"
               } ${clickable ? "cursor-pointer" : "cursor-default"}`}
             >
               <span
-                className={`flex h-6 w-6 items-center justify-center rounded-full ${
+                className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full ${
                   isActive || isDone ? "bg-moss text-paper" : "bg-[#E9E7E1] text-muted"
                 }`}
               >
@@ -38,7 +38,7 @@ export function Stepper({
               {s.label}
             </button>
             {i < steps.length - 1 && (
-              <div className={`mx-2.5 h-[1.5px] flex-1 ${isDone ? "bg-moss" : "bg-line"}`} />
+              <div className={`mx-1.5 h-[1.5px] flex-1 sm:mx-2.5 ${isDone ? "bg-moss" : "bg-line"}`} />
             )}
           </div>
         );
