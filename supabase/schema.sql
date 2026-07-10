@@ -386,18 +386,19 @@ alter table buildings alter column ward drop not null;
 -- Migration (2026-07-10): đổi danh sách Tình trạng phòng thành
 -- 'Trống' / 'Full' / 'Giữa tháng trống' / 'Cuối tháng trống'.
 -- Nếu project Supabase của bạn đã chạy schema.sql từ trước, chạy khối này
--- 1 lần trong SQL Editor. Bước UPDATE bên dưới remap dữ liệu cũ sang giá trị
--- mới TRƯỚC khi đổi constraint (nếu không sẽ lỗi vì dữ liệu cũ vi phạm
--- constraint mới):
+-- 1 lần trong SQL Editor. PHẢI xóa constraint cũ TRƯỚC khi remap dữ liệu —
+-- constraint cũ chưa cho phép giá trị 'Full' nên UPDATE sẽ lỗi nếu chạy
+-- trước bước DROP:
 --   'Đang thuê'      -> 'Full'  (rõ nghĩa, phòng đang có khách)
 --   'Đang sửa chữa'  -> 'Trống' (KHÔNG còn khớp nghĩa — cần tự rà soát lại
 --                                 các phòng này sau khi chạy migration)
 --   'Ngừng cho thuê' -> 'Trống' (tương tự, cần tự rà soát lại)
 -- ============================================================================
+alter table units drop constraint if exists units_status_check;
+
 update units set status = 'Full' where status = 'Đang thuê';
 update units set status = 'Trống' where status in ('Đang sửa chữa', 'Ngừng cho thuê');
 
-alter table units drop constraint if exists units_status_check;
 alter table units add constraint units_status_check
   check (status in ('Trống','Full','Giữa tháng trống','Cuối tháng trống'));
 
