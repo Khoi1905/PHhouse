@@ -1,0 +1,136 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Lock, Pencil, Trash2, Building2 } from "lucide-react";
+import { FormProvider, useForm } from "react-hook-form";
+import { Button, Modal, ConfirmDialog } from "@/components/ui";
+import { BuildingFields } from "@/components/forms/BuildingFields";
+import { buildingStepSchema, type WizardFormValues } from "@/lib/validation";
+import { updateBuildingAction, deleteBuildingAction } from "@/app/(app)/buildings/[id]/actions";
+
+export type BuildingHeaderData = {
+  id: string;
+  district: string;
+  ward: string;
+  alley: string | null;
+  houseNumber: string | null;
+  ownerCode: string;
+  ownerName?: string;
+};
+
+export function BuildingHeader({ data, isAdmin }: { data: BuildingHeaderData; isAdmin: boolean }) {
+  const router = useRouter();
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  const methods = useForm<WizardFormValues>({
+    defaultValues: {
+      mode: "new",
+      status: "Trống",
+      district: data.district as WizardFormValues["district"],
+      ward: data.ward,
+      alley: data.alley ?? "",
+      houseNumber: data.houseNumber ?? "",
+    },
+  });
+
+  function onSubmitEdit(values: WizardFormValues) {
+    setError(null);
+    const parsed = buildingStepSchema.safeParse(values);
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "Dữ liệu không hợp lệ.");
+      return;
+    }
+    startTransition(async () => {
+      const res = await updateBuildingAction(data.id, values);
+      if (!res.ok) {
+        setError(res.error);
+        return;
+      }
+      setEditOpen(false);
+      router.refresh();
+    });
+  }
+
+  function onConfirmDelete() {
+    startTransition(async () => {
+      const res = await deleteBuildingAction(data.id);
+      if (res.ok) {
+        router.push("/buildings");
+      } else {
+        setError(res.error);
+        setDeleteOpen(false);
+      }
+    });
+  }
+
+  const addressLine = [data.district, data.ward, data.alley].filter(Boolean).join(", ");
+
+  return (
+    <div className="mb-6 rounded-card border-[1.5px] border-line bg-white p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[9px] bg-moss text-paper">
+            <Building2 size={18} strokeWidth={2.2} />
+          </div>
+          <div>
+            <h1 className="font-display text-2xl font-bold text-ink">{addressLine}</h1>
+            {isAdmin && (
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-sale-lock">
+                <Lock size={12} />
+                Số nhà: {data.houseNumber || "—"}
+              </p>
+            )}
+            <p className="mt-1 text-sm text-muted-2">
+              Chủ sở hữu: <span className="font-semibold text-ink">{data.ownerCode}</span>
+              {isAdmin && data.ownerName ? ` — ${data.ownerName}` : ""}
+            </p>
+          </div>
+        </div>
+
+        {isAdmin && (
+          <div className="flex gap-2">
+            <Button variant="ghost" onClick={() => setEditOpen(true)}>
+              <Pencil size={14} /> Sửa tòa nhà
+            </Button>
+            <Button variant="danger" onClick={() => setDeleteOpen(true)}>
+              <Trash2 size={14} /> Xóa tòa nhà
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {error && <p className="mt-3 rounded-field bg-danger-bg px-3 py-2 text-[13px] text-danger-fg">{error}</p>}
+
+      <Modal open={editOpen} title="Sửa thông tin tòa nhà" onClose={() => setEditOpen(false)}>
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmitEdit)}>
+            <div className="grid grid-cols-1 gap-x-5 sm:grid-cols-2">
+              <BuildingFields />
+            </div>
+            <div className="mt-2 flex justify-end gap-2">
+              <Button type="button" variant="ghost" onClick={() => setEditOpen(false)}>
+                Hủy
+              </Button>
+              <Button type="submit" variant="save" disabled={pending}>
+                {pending ? "Đang lưu..." : "Lưu thay đổi"}
+              </Button>
+            </div>
+          </form>
+        </FormProvider>
+      </Modal>
+
+      <ConfirmDialog
+        open={deleteOpen}
+        title="Xóa tòa nhà vĩnh viễn"
+        description={`Toàn bộ phòng và lịch sử thay đổi thuộc tòa nhà "${addressLine}" sẽ bị xóa vĩnh viễn theo, không thể khôi phục.`}
+        onConfirm={onConfirmDelete}
+        onCancel={() => setDeleteOpen(false)}
+        pending={pending}
+      />
+    </div>
+  );
+}
