@@ -1,23 +1,24 @@
 import Link from "next/link";
 import { signOut } from "@/app/login/actions";
 import type { CurrentProfile } from "@/lib/supabase/profile";
+import { Logo } from "./Logo";
 
 export function NavBar({ profile }: { profile: CurrentProfile }) {
   return (
     <header className="border-b border-line bg-paper">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-8">
-          <span className="font-display text-lg font-bold text-ink">CHDV</span>
+          <Logo size="sm" />
           <nav className="flex items-center gap-5 text-sm font-semibold text-muted-2">
-            <Link href="/buildings" className="hover:text-ink">
+            <Link href="/buildings" className="hover:text-brand-orange">
               Tra cứu phòng
             </Link>
             {profile.role === "admin" && (
               <>
-                <Link href="/owners" className="hover:text-ink">
+                <Link href="/owners" className="hover:text-brand-orange">
                   Chủ sở hữu
                 </Link>
-                <Link href="/admin/new-entry" className="hover:text-ink">
+                <Link href="/admin/new-entry" className="text-brand-orange hover:text-brand-orange-dark">
                   + Thêm mới
                 </Link>
               </>

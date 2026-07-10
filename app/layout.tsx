@@ -11,13 +11,13 @@ const fraunces = Fraunces({
 
 const inter = Inter({
   subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-inter",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "CHDV — Quản lý căn hộ dịch vụ",
+  title: "PH House — Quản lý căn hộ dịch vụ",
   description: "Hệ thống quản lý & tra cứu căn hộ dịch vụ",
 };
 

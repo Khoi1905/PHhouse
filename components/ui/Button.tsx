@@ -5,7 +5,7 @@ type Variant = "ghost" | "primary" | "save" | "danger";
 
 const VARIANT_CLASSES: Record<Variant, string> = {
   ghost: "border-[1.5px] border-line bg-transparent text-muted-2",
-  primary: "bg-ink text-paper",
+  primary: "bg-brand-orange text-white hover:bg-brand-orange-dark",
   save: "bg-moss text-paper",
   danger: "bg-[#9C4A4A] text-white",
 };

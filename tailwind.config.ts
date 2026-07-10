@@ -25,6 +25,12 @@ const config: Config = {
         "muted-2": "#6B6858",
         placeholder: "#B4B0A3",
         danger: { bg: "#F0E5E5", fg: "#9C4A4A" },
+        // Thương hiệu PH House — lấy chính xác từ logo-icon.png (sampled pixel).
+        brand: {
+          orange: "#F86008",
+          "orange-dark": "#CB4F07",
+          navy: "#200848",
+        },
         status: {
           trong: { bg: "#E8F0E5", fg: "#3E5641" },
           "dang-thue": { bg: "#F2E9E0", fg: "#B5764A" },

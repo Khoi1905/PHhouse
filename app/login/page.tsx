@@ -2,6 +2,7 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { signIn } from "./actions";
+import { Logo } from "@/components/layout/Logo";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -9,7 +10,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-field bg-ink py-2.5 text-sm font-semibold text-paper transition-opacity hover:opacity-90 disabled:opacity-50"
+      className="w-full rounded-field bg-brand-orange py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-orange-dark disabled:opacity-50"
     >
       {pending ? "Đang đăng nhập..." : "Đăng nhập"}
     </button>
@@ -24,10 +25,8 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-paper px-6">
       <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-clay">
-            CHDV
-          </p>
+        <div className="mb-8 flex flex-col items-center text-center">
+          <Logo size="lg" className="mb-4 flex-col gap-2" />
           <h1 className="font-display text-3xl font-bold text-ink">Đăng nhập</h1>
           <p className="mt-2 text-sm text-muted-2">
             Hệ thống quản lý &amp; tra cứu căn hộ dịch vụ

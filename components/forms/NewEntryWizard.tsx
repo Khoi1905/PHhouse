@@ -81,8 +81,8 @@ export function NewEntryWizard() {
   return (
     <div className="mx-auto max-w-2xl pb-24">
       <div className="mb-7">
-        <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-clay">
-          CHDV · Nhập liệu căn hộ
+        <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-orange">
+          PH HOUSE · Nhập liệu căn hộ
         </p>
         <h1 className="font-display text-3xl font-bold text-ink">Thêm mới vào hệ thống</h1>
         <p className="mt-2 max-w-md text-[13.5px] leading-relaxed text-muted-2">
