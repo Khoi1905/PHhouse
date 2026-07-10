@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import type { ZodError } from "zod";
 import { User, Building2, Home, ChevronLeft, ChevronRight, Check } from "lucide-react";
@@ -27,12 +27,23 @@ const STEPS: Step[] = [
 
 export function NewEntryWizard() {
   const router = useRouter();
-  const [step, setStep] = useState(0);
+  const searchParams = useSearchParams();
+  const presetOwnerId = searchParams.get("ownerId");
+  const presetOwnerLabel = searchParams.get("ownerLabel");
+
+  const [step, setStep] = useState(presetOwnerId ? 1 : 0);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const methods = useForm<WizardFormValues>({
-    defaultValues: { mode: "new", status: "Trống" },
+    defaultValues: presetOwnerId
+      ? {
+          mode: "existing",
+          ownerId: presetOwnerId,
+          ownerCode: presetOwnerLabel ?? "",
+          status: "Trống",
+        }
+      : { mode: "new", status: "Trống" },
   });
   const { handleSubmit, getValues, setError, clearErrors, watch } = methods;
 

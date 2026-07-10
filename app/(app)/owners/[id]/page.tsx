@@ -47,7 +47,9 @@ export default async function OwnerDetailPage({ params }: { params: Promise<{ id
           Tòa nhà ({buildingsWithUnits.length})
         </h2>
         <Link
-          href="/admin/new-entry"
+          href={`/admin/new-entry?ownerId=${owner.id}&ownerLabel=${encodeURIComponent(
+            `${owner.owner_code} — ${owner.full_name}`
+          )}`}
           className="inline-flex items-center gap-1.5 rounded-[9px] bg-ink px-4 py-2 text-[13.5px] font-semibold text-paper hover:opacity-90"
         >
           <Plus size={15} /> Thêm tòa nhà mới
