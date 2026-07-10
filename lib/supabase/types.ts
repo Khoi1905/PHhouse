@@ -38,7 +38,7 @@ export type Database = {
           id: string;
           owner_id: string;
           district: District;
-          ward: string;
+          ward: string | null;
           alley: string | null;
           house_number: string | null;
           note: string | null;
@@ -49,7 +49,7 @@ export type Database = {
           id?: string;
           owner_id: string;
           district: District;
-          ward: string;
+          ward?: string | null;
           alley?: string | null;
           house_number?: string | null;
           note?: string | null;
@@ -135,7 +135,7 @@ export type Database = {
           owner_id: string;
           owner_code: string;
           district: District;
-          ward: string;
+          ward: string | null;
           alley: string | null;
           note: string | null;
           created_at: string;
@@ -157,7 +157,7 @@ export type Database = {
         Returns: {
           id: string;
           district: District;
-          ward: string;
+          ward: string | null;
           alley: string | null;
           house_number: string | null;
           owner_id: string;
@@ -182,7 +182,7 @@ export type Database = {
           p_owner_bank_account: string | null;
           p_owner_note: string | null;
           p_district: string;
-          p_ward: string;
+          p_ward: string | null;
           p_alley: string | null;
           p_house_number: string | null;
           p_building_note: string | null;

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 export type BuildingRow = {
   id: string;
   district: string;
-  ward: string;
+  ward: string | null;
   alley: string | null;
   owner_code: string;
   total_units: number;
@@ -43,7 +43,7 @@ export function BuildingsTable({ rows }: { rows: BuildingRow[] }) {
               className="cursor-pointer border-b border-line last:border-0 hover:bg-paper"
             >
               <td className="px-4 py-3 text-ink">{r.district}</td>
-              <td className="px-4 py-3 text-ink">{r.ward}</td>
+              <td className="px-4 py-3 text-ink">{r.ward || "—"}</td>
               <td className="px-4 py-3 text-muted-2">{r.alley || "—"}</td>
               <td className="px-4 py-3 font-semibold text-ink">{r.owner_code}</td>
               <td className="px-4 py-3 text-ink">

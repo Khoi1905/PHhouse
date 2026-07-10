@@ -39,7 +39,7 @@ create table if not exists buildings (
     'Hoài Đức','Mỹ Đức','Phú Xuyên','Phúc Thọ','Quốc Oai','Thạch Thất',
     'Thanh Oai','Thường Tín','Ứng Hòa','Mê Linh','Sơn Tây'
   )),
-  ward text not null,
+  ward text,
   alley text,
   house_number text,
   note text,
@@ -53,7 +53,7 @@ create table if not exists units (
   room_number text not null,
   unit_type text not null check (unit_type in ('Studio','1N1K','2N1K','Gác xép','Giường tầng')),
   price_month numeric not null,
-  status text not null default 'Trống' check (status in ('Trống','Đang thuê','Đang sửa chữa','Ngừng cho thuê')),
+  status text not null default 'Trống' check (status in ('Trống','Full','Giữa tháng trống','Cuối tháng trống')),
   details_text text,
   gdrive_folder_link text,
   note text,
@@ -267,7 +267,7 @@ begin
     b.owner_id,
     o.owner_code,
     count(u.id) as total_units,
-    count(u.id) filter (where u.status = 'Trống') as vacant_units
+    count(u.id) filter (where u.status in ('Trống','Giữa tháng trống','Cuối tháng trống')) as vacant_units
   from buildings b
   join owners o on o.id = b.owner_id
   left join units u on u.building_id = b.id
@@ -276,7 +276,7 @@ begin
     and (p_owner_code is null or p_owner_code = '' or o.owner_code ilike '%' || p_owner_code || '%')
     and (
       p_keyword is null or p_keyword = '' or
-      unaccent(lower(b.ward)) ilike '%' || unaccent(lower(p_keyword)) || '%' or
+      unaccent(lower(coalesce(b.ward,''))) ilike '%' || unaccent(lower(p_keyword)) || '%' or
       unaccent(lower(coalesce(b.alley,''))) ilike '%' || unaccent(lower(p_keyword)) || '%' or
       unaccent(lower(o.full_name)) ilike '%' || unaccent(lower(p_keyword)) || '%'
     )
@@ -314,7 +314,7 @@ create or replace function create_full_entry(
   p_owner_bank_account text,
   p_owner_note text,
   p_district text,
-  p_ward text,
+  p_ward text default null,
   p_alley text,
   p_house_number text,
   p_building_note text,
@@ -349,7 +349,7 @@ begin
   end if;
 
   insert into buildings (owner_id, district, ward, alley, house_number, note)
-  values (v_owner_id, p_district, p_ward, nullif(p_alley, ''), nullif(p_house_number, ''), nullif(p_building_note, ''))
+  values (v_owner_id, p_district, nullif(p_ward, ''), nullif(p_alley, ''), nullif(p_house_number, ''), nullif(p_building_note, ''))
   returning id into v_building_id;
 
   insert into units (building_id, room_number, unit_type, price_month, status, details_text, gdrive_folder_link, note)
@@ -376,6 +376,32 @@ grant execute on function auth_role to authenticated;
 grant execute on function create_full_entry to authenticated;
 
 -- ============================================================================
+-- Migration (2026-07-10): Phường/Xã không còn bắt buộc.
+-- Nếu project Supabase của bạn đã chạy schema.sql từ trước (ward đang NOT
+-- NULL), chạy riêng lệnh này 1 lần trong SQL Editor để đồng bộ:
+-- ============================================================================
+alter table buildings alter column ward drop not null;
+
+-- ============================================================================
+-- Migration (2026-07-10): đổi danh sách Tình trạng phòng thành
+-- 'Trống' / 'Full' / 'Giữa tháng trống' / 'Cuối tháng trống'.
+-- Nếu project Supabase của bạn đã chạy schema.sql từ trước, chạy khối này
+-- 1 lần trong SQL Editor. Bước UPDATE bên dưới remap dữ liệu cũ sang giá trị
+-- mới TRƯỚC khi đổi constraint (nếu không sẽ lỗi vì dữ liệu cũ vi phạm
+-- constraint mới):
+--   'Đang thuê'      -> 'Full'  (rõ nghĩa, phòng đang có khách)
+--   'Đang sửa chữa'  -> 'Trống' (KHÔNG còn khớp nghĩa — cần tự rà soát lại
+--                                 các phòng này sau khi chạy migration)
+--   'Ngừng cho thuê' -> 'Trống' (tương tự, cần tự rà soát lại)
+-- ============================================================================
+update units set status = 'Full' where status = 'Đang thuê';
+update units set status = 'Trống' where status in ('Đang sửa chữa', 'Ngừng cho thuê');
+
+alter table units drop constraint if exists units_status_check;
+alter table units add constraint units_status_check
+  check (status in ('Trống','Full','Giữa tháng trống','Cuối tháng trống'));
+
+-- ============================================================================
 -- Bootstrap: tạo tài khoản admin đầu tiên (một lần, thủ công)
 -- ============================================================================
 -- 1. Supabase Dashboard → Authentication → Users → Add user (email + password).
@@ -386,5 +412,3 @@ grant execute on function create_full_entry to authenticated;
 --
 -- Tạo tài khoản sale sau này lặp lại đúng 2 bước trên với role = 'sale'.
 -- ============================================================================
--- sale: thuynga7229@gmail.com - phhouse123
--- admin: admin@gmail.com - phhouse123

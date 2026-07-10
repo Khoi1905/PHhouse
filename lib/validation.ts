@@ -35,7 +35,7 @@ export type OwnerStepValues = z.infer<typeof ownerStepSchema>;
 
 export const buildingStepSchema = z.object({
   district: z.enum(DISTRICTS, { error: "Vui lòng chọn quận/huyện" }),
-  ward: z.string().min(1, "Bắt buộc"),
+  ward: z.string().optional(),
   alley: z.string().optional(),
   houseNumber: z.string().optional(),
   buildingNote: z.string().optional(),

@@ -12,7 +12,7 @@ import { updateBuildingAction, deleteBuildingAction } from "@/app/(app)/building
 export type BuildingHeaderData = {
   id: string;
   district: string;
-  ward: string;
+  ward: string | null;
   alley: string | null;
   houseNumber: string | null;
   ownerCode: string;
@@ -31,7 +31,7 @@ export function BuildingHeader({ data, isAdmin }: { data: BuildingHeaderData; is
       mode: "new",
       status: "Trống",
       district: data.district as WizardFormValues["district"],
-      ward: data.ward,
+      ward: data.ward ?? "",
       alley: data.alley ?? "",
       houseNumber: data.houseNumber ?? "",
     },

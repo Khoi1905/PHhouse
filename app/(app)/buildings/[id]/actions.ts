@@ -75,7 +75,7 @@ export async function updateBuildingAction(
     .from("buildings")
     .update({
       district: v.district,
-      ward: v.ward,
+      ward: v.ward || null,
       alley: v.alley || null,
       house_number: v.houseNumber || null,
       note: v.buildingNote || null,

@@ -40,7 +40,7 @@ export async function createFullEntry(values: FullEntryFormValues): Promise<Crea
     p_owner_bank_account: v.mode === "new" ? v.bankAccount ?? null : null,
     p_owner_note: v.mode === "new" ? v.ownerNote ?? null : null,
     p_district: v.district,
-    p_ward: v.ward,
+    p_ward: v.ward ?? null,
     p_alley: v.alley ?? null,
     p_house_number: v.houseNumber ?? null,
     p_building_note: v.buildingNote ?? null,

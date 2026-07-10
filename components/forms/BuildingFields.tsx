@@ -13,7 +13,7 @@ export function BuildingFields() {
       <Field label="Quận / Huyện" required hint="Sale lọc được theo trường này">
         <Select options={DISTRICTS} {...register("district")} />
       </Field>
-      <Field label="Phường / Xã" required hint="Sale lọc được theo trường này">
+      <Field label="Phường / Xã" hint="Sale lọc được theo trường này">
         <TextInput placeholder="Dịch Vọng Hậu" {...register("ward")} />
       </Field>
 
