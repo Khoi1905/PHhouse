@@ -7,6 +7,17 @@ export function parsePrice(raw: string): number {
   return digits ? Number(digits) : 0;
 }
 
+const DIACRITIC_MARKS = /[̀-ͯ]/g;
+
+export function stripDiacritics(input: string): string {
+  return input
+    .normalize("NFD")
+    .replace(DIACRITIC_MARKS, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toLowerCase();
+}
+
 export function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString("vi-VN", {
     day: "2-digit",

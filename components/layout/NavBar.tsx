@@ -20,6 +20,9 @@ export function NavBar({ profile }: { profile: CurrentProfile }) {
           <Link href="/owners" className="hover:text-brand-orange" onClick={() => setOpen(false)}>
             Chủ sở hữu
           </Link>
+          <Link href="/admin/overview" className="hover:text-brand-orange" onClick={() => setOpen(false)}>
+            Bảng tổng hợp
+          </Link>
           <Link
             href="/admin/new-entry"
             className="text-brand-orange hover:text-brand-orange-dark"
