@@ -314,7 +314,7 @@ create or replace function create_full_entry(
   p_owner_bank_account text,
   p_owner_note text,
   p_district text,
-  p_ward text default null,
+  p_ward text,
   p_alley text,
   p_house_number text,
   p_building_note text,
