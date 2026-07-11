@@ -19,6 +19,8 @@ type RawBuilding = {
   ward: string | null;
   alley: string | null;
   house_number: string | null;
+  guide_name: string | null;
+  guide_phone: string | null;
   units: RawUnit[];
 };
 
@@ -26,6 +28,8 @@ type RawOwner = {
   id: string;
   owner_code: string;
   full_name: string;
+  commission_sale_pct: number | null;
+  commission_total_pct: number | null;
   buildings: RawBuilding[];
 };
 
@@ -34,8 +38,8 @@ export default async function AdminOverviewPage() {
   const { data } = await supabase
     .from("owners")
     .select(
-      `id, owner_code, full_name,
-       buildings ( id, district, ward, alley, house_number,
+      `id, owner_code, full_name, commission_sale_pct, commission_total_pct,
+       buildings ( id, district, ward, alley, house_number, guide_name, guide_phone,
          units ( id, room_number, unit_type, price_month, status, details_text, gdrive_folder_link, note ) )`
     )
     .order("owner_code")
@@ -45,6 +49,8 @@ export default async function AdminOverviewPage() {
     id: o.id,
     ownerCode: o.owner_code,
     fullName: o.full_name,
+    commissionSalePct: o.commission_sale_pct,
+    commissionTotalPct: o.commission_total_pct,
     rows: (o.buildings ?? []).flatMap((b) =>
       (b.units ?? []).map((u) => ({
         buildingId: b.id,
@@ -52,6 +58,8 @@ export default async function AdminOverviewPage() {
         ward: b.ward,
         alley: b.alley,
         houseNumber: b.house_number,
+        guideName: b.guide_name,
+        guidePhone: b.guide_phone,
         unitId: u.id,
         roomNumber: u.room_number,
         unitType: u.unit_type,

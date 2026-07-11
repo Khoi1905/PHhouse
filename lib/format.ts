@@ -18,6 +18,12 @@ export function stripDiacritics(input: string): string {
     .toLowerCase();
 }
 
+export function parsePercent(raw?: string): number | null {
+  if (!raw || !raw.trim()) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
 export function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString("vi-VN", {
     day: "2-digit",

@@ -13,6 +13,8 @@ export type OverviewRow = {
   ward: string | null;
   alley: string | null;
   houseNumber: string | null;
+  guideName: string | null;
+  guidePhone: string | null;
   unitId: string;
   roomNumber: string;
   unitType: string;
@@ -27,6 +29,8 @@ export type OwnerSheet = {
   id: string;
   ownerCode: string;
   fullName: string;
+  commissionSalePct: number | null;
+  commissionTotalPct: number | null;
   rows: OverviewRow[];
 };
 
@@ -164,12 +168,25 @@ export function OverviewSheet({ sheets }: { sheets: OwnerSheet[] }) {
           ) : (
             <>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <h2 className="font-display text-lg font-semibold text-ink">
-                  {selected.ownerCode} — {selected.fullName}{" "}
-                  <span className="font-sans text-sm font-normal text-muted">
-                    ({selected.rows.length} phòng)
-                  </span>
-                </h2>
+                <div>
+                  <h2 className="font-display text-lg font-semibold text-ink">
+                    {selected.ownerCode} — {selected.fullName}{" "}
+                    <span className="font-sans text-sm font-normal text-muted">
+                      ({selected.rows.length} phòng)
+                    </span>
+                  </h2>
+                  {(selected.commissionSalePct != null || selected.commissionTotalPct != null) && (
+                    <p className="mt-0.5 text-[13px] text-muted-2">
+                      {selected.commissionSalePct != null && `Hoa hồng cho sale: ${selected.commissionSalePct}%`}
+                      {selected.commissionSalePct != null && selected.commissionTotalPct != null && " · "}
+                      {selected.commissionTotalPct != null && (
+                        <span className="inline-flex items-center gap-1 text-sale-lock">
+                          <Lock size={10} /> Hoa hồng tổng: {selected.commissionTotalPct}%
+                        </span>
+                      )}
+                    </p>
+                  )}
+                </div>
                 <a
                   href={`/api/owners/${selected.id}/export`}
                   className="inline-flex items-center gap-1.5 rounded-field border-[1.5px] border-line px-3 py-1.5 text-[13px] font-semibold text-muted-2 hover:border-ink hover:text-ink"
@@ -195,6 +212,16 @@ export function OverviewSheet({ sheets }: { sheets: OwnerSheet[] }) {
                             <Lock size={10} /> Số nhà
                           </span>
                         </th>
+                        <th className="border-b border-r border-line px-3 py-2">
+                          <span className="inline-flex items-center gap-1 text-sale-lock">
+                            <Lock size={10} /> Người dẫn
+                          </span>
+                        </th>
+                        <th className="border-b border-r border-line px-3 py-2">
+                          <span className="inline-flex items-center gap-1 text-sale-lock">
+                            <Lock size={10} /> Số dẫn
+                          </span>
+                        </th>
                         <th className="border-b border-r border-line px-3 py-2">Số phòng</th>
                         <th className="border-b border-r border-line px-3 py-2">Loại</th>
                         <th className="border-b border-r border-line px-3 py-2">Giá/tháng</th>
@@ -211,6 +238,12 @@ export function OverviewSheet({ sheets }: { sheets: OwnerSheet[] }) {
                           <td className="border-b border-r border-line px-3 py-2 text-muted-2">{r.alley || "—"}</td>
                           <td className="border-b border-r border-line px-3 py-2 text-sale-lock">
                             {r.houseNumber || "—"}
+                          </td>
+                          <td className="border-b border-r border-line px-3 py-2 text-sale-lock">
+                            {r.guideName || "—"}
+                          </td>
+                          <td className="border-b border-r border-line px-3 py-2 text-sale-lock">
+                            {r.guidePhone || "—"}
                           </td>
                           <td className="border-b border-r border-line px-3 py-2 font-semibold text-ink">
                             {r.roomNumber}

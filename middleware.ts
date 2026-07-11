@@ -40,13 +40,7 @@ export async function middleware(request: NextRequest) {
 
   if (user && isLoginPage) {
     const url = request.nextUrl.clone();
-    url.pathname = "/buildings";
-    return NextResponse.redirect(url);
-  }
-
-  if (user && pathname === "/") {
-    const url = request.nextUrl.clone();
-    url.pathname = "/buildings";
+    url.pathname = "/";
     return NextResponse.redirect(url);
   }
 

@@ -15,8 +15,12 @@ export type BuildingHeaderData = {
   ward: string | null;
   alley: string | null;
   houseNumber: string | null;
+  guideName?: string | null;
+  guidePhone?: string | null;
   ownerCode: string;
   ownerName?: string;
+  commissionSalePct?: number | null;
+  commissionTotalPct?: number | null;
 };
 
 export function BuildingHeader({ data, isAdmin }: { data: BuildingHeaderData; isAdmin: boolean }) {
@@ -34,6 +38,8 @@ export function BuildingHeader({ data, isAdmin }: { data: BuildingHeaderData; is
       ward: data.ward ?? "",
       alley: data.alley ?? "",
       houseNumber: data.houseNumber ?? "",
+      guideName: data.guideName ?? "",
+      guidePhone: data.guidePhone ?? "",
     },
   });
 
@@ -84,10 +90,26 @@ export function BuildingHeader({ data, isAdmin }: { data: BuildingHeaderData; is
                 Số nhà: {data.houseNumber || "—"}
               </p>
             )}
+            {isAdmin && (data.guideName || data.guidePhone) && (
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-sale-lock">
+                <Lock size={12} />
+                Người dẫn: {data.guideName || "—"}
+                {data.guidePhone ? ` · ${data.guidePhone}` : ""}
+              </p>
+            )}
             <p className="mt-1 text-sm text-muted-2">
               Chủ sở hữu: <span className="font-semibold text-ink">{data.ownerCode}</span>
               {isAdmin && data.ownerName ? ` — ${data.ownerName}` : ""}
             </p>
+            {data.commissionSalePct != null && (
+              <p className="mt-1 text-sm text-muted-2">Hoa hồng cho sale: {data.commissionSalePct}%</p>
+            )}
+            {isAdmin && data.commissionTotalPct != null && (
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-sale-lock">
+                <Lock size={12} />
+                Hoa hồng tổng: {data.commissionTotalPct}%
+              </p>
+            )}
           </div>
         </div>
 

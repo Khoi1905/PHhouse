@@ -24,6 +24,10 @@ create table if not exists owners (
   id_number text,
   bank_account text,
   note text,
+  -- % hoa hồng. commission_sale_pct: public, sale xem được (qua buildings_sale_view).
+  -- commission_total_pct: chỉ admin xem, không lộ qua bất kỳ view/RPC nào cho sale.
+  commission_sale_pct numeric check (commission_sale_pct is null or (commission_sale_pct >= 0 and commission_sale_pct <= 100)),
+  commission_total_pct numeric check (commission_total_pct is null or (commission_total_pct >= 0 and commission_total_pct <= 100)),
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
@@ -42,6 +46,10 @@ create table if not exists buildings (
   ward text,
   alley text,
   house_number text,
+  -- Người dẫn sale đi xem phòng trực tiếp. Nhạy cảm như house_number — chỉ
+  -- admin xem, không lộ qua buildings_sale_view.
+  guide_name text,
+  guide_phone text,
   note text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
@@ -51,7 +59,7 @@ create table if not exists units (
   id uuid primary key default gen_random_uuid(),
   building_id uuid references buildings(id) on delete cascade not null,
   room_number text not null,
-  unit_type text not null check (unit_type in ('Studio','1N1K','2N1K','Gác xép','Giường tầng')),
+  unit_type text not null check (unit_type in ('Studio','1N1K','2N1K','Gác xép','Giường tầng','Đơn-VSC')),
   price_month numeric not null,
   status text not null default 'Trống' check (status in ('Trống','Full','Giữa tháng trống','Cuối tháng trống')),
   details_text text,
@@ -198,9 +206,9 @@ create policy "user_select_own_profile" on user_profiles
 -- 6. buildings_sale_view — the approved mechanism for hiding house_number.
 --    Created without security_invoker, so it runs with the view owner's
 --    privileges (bypassing the admin-only RLS above) while only ever
---    exposing the safe column list below. owner_code is joined in because
---    the sitemap requires sale to filter/see it, but no other owner field
---    (phone/bank/email/note) is exposed.
+--    exposing the safe column list below. owner_code and commission_sale_pct
+--    are joined in because they're meant to be public to sale, but no other
+--    owner field (phone/bank/email/note/commission_total_pct) is exposed.
 -- ----------------------------------------------------------------------------
 drop view if exists buildings_sale_view;
 create view buildings_sale_view
@@ -210,6 +218,7 @@ select
   b.id,
   b.owner_id,
   o.owner_code,
+  o.commission_sale_pct,
   b.district,
   b.ward,
   b.alley,
@@ -313,10 +322,14 @@ create or replace function create_full_entry(
   p_owner_email text,
   p_owner_bank_account text,
   p_owner_note text,
+  p_owner_commission_sale_pct numeric,
+  p_owner_commission_total_pct numeric,
   p_district text,
   p_ward text,
   p_alley text,
   p_house_number text,
+  p_guide_name text,
+  p_guide_phone text,
   p_building_note text,
   p_room_number text,
   p_unit_type text,
@@ -342,14 +355,17 @@ begin
   if p_owner_mode = 'existing' then
     v_owner_id := p_owner_id;
   else
-    insert into owners (owner_code, full_name, phone, phone_secondary, email, bank_account, note)
+    insert into owners (owner_code, full_name, phone, phone_secondary, email, bank_account, note,
+                         commission_sale_pct, commission_total_pct)
     values (p_owner_code, p_owner_full_name, p_owner_phone, nullif(p_owner_phone_secondary, ''),
-            nullif(p_owner_email, ''), nullif(p_owner_bank_account, ''), nullif(p_owner_note, ''))
+            nullif(p_owner_email, ''), nullif(p_owner_bank_account, ''), nullif(p_owner_note, ''),
+            p_owner_commission_sale_pct, p_owner_commission_total_pct)
     returning id into v_owner_id;
   end if;
 
-  insert into buildings (owner_id, district, ward, alley, house_number, note)
-  values (v_owner_id, p_district, nullif(p_ward, ''), nullif(p_alley, ''), nullif(p_house_number, ''), nullif(p_building_note, ''))
+  insert into buildings (owner_id, district, ward, alley, house_number, guide_name, guide_phone, note)
+  values (v_owner_id, p_district, nullif(p_ward, ''), nullif(p_alley, ''), nullif(p_house_number, ''),
+          nullif(p_guide_name, ''), nullif(p_guide_phone, ''), nullif(p_building_note, ''))
   returning id into v_building_id;
 
   insert into units (building_id, room_number, unit_type, price_month, status, details_text, gdrive_folder_link, note)
@@ -401,6 +417,40 @@ update units set status = 'Trống' where status in ('Đang sửa chữa', 'Ng�
 
 alter table units add constraint units_status_check
   check (status in ('Trống','Full','Giữa tháng trống','Cuối tháng trống'));
+
+-- ============================================================================
+-- Migration (2026-07-12): thêm % hoa hồng theo chủ sở hữu.
+-- Nếu project Supabase của bạn đã chạy schema.sql từ trước, chạy khối này
+-- 1 lần trong SQL Editor để đồng bộ:
+-- ============================================================================
+alter table owners add column if not exists commission_sale_pct numeric;
+alter table owners add column if not exists commission_total_pct numeric;
+
+alter table owners drop constraint if exists owners_commission_sale_pct_check;
+alter table owners add constraint owners_commission_sale_pct_check
+  check (commission_sale_pct is null or (commission_sale_pct >= 0 and commission_sale_pct <= 100));
+
+alter table owners drop constraint if exists owners_commission_total_pct_check;
+alter table owners add constraint owners_commission_total_pct_check
+  check (commission_total_pct is null or (commission_total_pct >= 0 and commission_total_pct <= 100));
+
+-- ============================================================================
+-- Migration (2026-07-12): thêm loại phòng "Đơn-VSC".
+-- Nếu project Supabase của bạn đã chạy schema.sql từ trước, chạy khối này
+-- 1 lần trong SQL Editor để đồng bộ. Chỉ THÊM giá trị mới nên không cần remap
+-- dữ liệu cũ (khác migration đổi status trước đây).
+-- ============================================================================
+alter table units drop constraint if exists units_unit_type_check;
+alter table units add constraint units_unit_type_check
+  check (unit_type in ('Studio','1N1K','2N1K','Gác xép','Giường tầng','Đơn-VSC'));
+
+-- ============================================================================
+-- Migration (2026-07-12): thêm "Người dẫn" / "Số dẫn" cho tòa nhà (nhạy cảm
+-- như house_number — chỉ admin xem). Nếu project Supabase của bạn đã chạy
+-- schema.sql từ trước, chạy khối này 1 lần trong SQL Editor để đồng bộ:
+-- ============================================================================
+alter table buildings add column if not exists guide_name text;
+alter table buildings add column if not exists guide_phone text;
 
 -- ============================================================================
 -- Bootstrap: tạo tài khoản admin đầu tiên (một lần, thủ công)

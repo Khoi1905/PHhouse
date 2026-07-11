@@ -17,7 +17,9 @@ export default async function BuildingDetailPage({ params }: { params: Promise<{
   if (isAdmin) {
     const { data } = await supabase
       .from("buildings")
-      .select("id, district, ward, alley, house_number, owner_id, owners(owner_code, full_name)")
+      .select(
+        "id, district, ward, alley, house_number, guide_name, guide_phone, owner_id, owners(owner_code, full_name, commission_sale_pct, commission_total_pct)"
+      )
       .eq("id", id)
       .single();
 
@@ -29,14 +31,18 @@ export default async function BuildingDetailPage({ params }: { params: Promise<{
         ward: data.ward,
         alley: data.alley,
         houseNumber: data.house_number,
+        guideName: data.guide_name,
+        guidePhone: data.guide_phone,
         ownerCode: owner?.owner_code ?? "—",
         ownerName: owner?.full_name,
+        commissionSalePct: owner?.commission_sale_pct,
+        commissionTotalPct: owner?.commission_total_pct,
       };
     }
   } else {
     const { data } = await supabase
       .from("buildings_sale_view")
-      .select("id, district, ward, alley, owner_code")
+      .select("id, district, ward, alley, owner_code, commission_sale_pct")
       .eq("id", id)
       .single();
 
@@ -48,6 +54,7 @@ export default async function BuildingDetailPage({ params }: { params: Promise<{
         alley: data.alley,
         houseNumber: null,
         ownerCode: data.owner_code,
+        commissionSalePct: data.commission_sale_pct,
       };
     }
   }

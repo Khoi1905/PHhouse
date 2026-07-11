@@ -29,6 +29,13 @@ export function BuildingFields() {
         </Field>
       </div>
 
+      <Field label="Tên người dẫn" locked hint="Ẩn khỏi mọi tài khoản sale">
+        <LockedInput placeholder="Nguyễn Văn B" {...register("guideName")} />
+      </Field>
+      <Field label="Số dẫn" locked hint="SĐT người dẫn sale đi xem phòng — ẩn khỏi sale">
+        <LockedInput placeholder="0912 345 678" {...register("guidePhone")} />
+      </Field>
+
       <div className="sm:col-span-2">
         <Field label="Ghi chú tòa nhà" hint="Đặc điểm chung của tòa, không bắt buộc">
           <Textarea rows={2} placeholder="Ghi chú..." {...register("buildingNote")} />

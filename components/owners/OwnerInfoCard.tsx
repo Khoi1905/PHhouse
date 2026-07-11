@@ -56,6 +56,15 @@ export function OwnerInfoCard({ owner }: { owner: OwnerRow }) {
             </p>
             {owner.email && <p className="mt-0.5 text-sm text-muted-2">{owner.email}</p>}
             {owner.bank_account && <p className="mt-0.5 text-sm text-muted-2">STK: {owner.bank_account}</p>}
+            {(owner.commission_sale_pct != null || owner.commission_total_pct != null) && (
+              <p className="mt-0.5 text-sm text-muted-2">
+                {owner.commission_sale_pct != null && `Hoa hồng sale: ${owner.commission_sale_pct}%`}
+                {owner.commission_sale_pct != null && owner.commission_total_pct != null && " · "}
+                {owner.commission_total_pct != null && (
+                  <span className="text-sale-lock">Hoa hồng tổng: {owner.commission_total_pct}%</span>
+                )}
+              </p>
+            )}
             {owner.note && <p className="mt-2 text-sm text-muted">{owner.note}</p>}
           </div>
         </div>
@@ -82,6 +91,8 @@ export function OwnerInfoCard({ owner }: { owner: OwnerRow }) {
             bankAccount: owner.bank_account ?? "",
             idNumber: owner.id_number ?? "",
             ownerNote: owner.note ?? "",
+            commissionSalePct: owner.commission_sale_pct?.toString() ?? "",
+            commissionTotalPct: owner.commission_total_pct?.toString() ?? "",
           }}
           onSubmit={submitEdit}
           onCancel={() => setEditOpen(false)}

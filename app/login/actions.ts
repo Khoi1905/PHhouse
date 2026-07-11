@@ -18,7 +18,7 @@ export async function signIn(_prevState: { error: string | null }, formData: For
     return { error: "Email hoặc mật khẩu không đúng." };
   }
 
-  redirect("/buildings");
+  redirect("/");
 }
 
 export async function signOut() {

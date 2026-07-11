@@ -1,6 +1,17 @@
 import { z } from "zod";
 import { DISTRICTS, UNIT_TYPES, UNIT_STATUSES, type District, type UnitType, type UnitStatus } from "./constants";
 
+// % hoa hồng nhập dạng chuỗi (giống các field optional khác), chỉ validate là
+// số 0-100 khi có giá trị — để trống thì bỏ qua, convert sang number | null
+// ở tầng server action (xem app/(app)/admin/new-entry/actions.ts).
+const percentString = z
+  .string()
+  .optional()
+  .refine(
+    (v) => !v || !v.trim() || (Number.isFinite(Number(v)) && Number(v) >= 0 && Number(v) <= 100),
+    { message: "Phải là số từ 0 đến 100" }
+  );
+
 export const ownerNewSchema = z.object({
   mode: z.literal("new"),
   ownerCode: z.string().min(1, "Bắt buộc"),
@@ -11,6 +22,8 @@ export const ownerNewSchema = z.object({
   bankAccount: z.string().optional(),
   idNumber: z.string().optional(),
   ownerNote: z.string().optional(),
+  commissionSalePct: percentString,
+  commissionTotalPct: percentString,
 });
 
 export const ownerEditSchema = z.object({
@@ -22,6 +35,8 @@ export const ownerEditSchema = z.object({
   bankAccount: z.string().optional(),
   idNumber: z.string().optional(),
   ownerNote: z.string().optional(),
+  commissionSalePct: percentString,
+  commissionTotalPct: percentString,
 });
 export type OwnerEditValues = z.infer<typeof ownerEditSchema>;
 
@@ -38,6 +53,8 @@ export const buildingStepSchema = z.object({
   ward: z.string().optional(),
   alley: z.string().optional(),
   houseNumber: z.string().optional(),
+  guideName: z.string().optional(),
+  guidePhone: z.string().optional(),
   buildingNote: z.string().optional(),
 });
 export type BuildingStepValues = z.infer<typeof buildingStepSchema>;
@@ -76,10 +93,14 @@ export type WizardFormValues = {
   bankAccount?: string;
   idNumber?: string;
   ownerNote?: string;
+  commissionSalePct?: string;
+  commissionTotalPct?: string;
   district?: District;
   ward?: string;
   alley?: string;
   houseNumber?: string;
+  guideName?: string;
+  guidePhone?: string;
   buildingNote?: string;
   roomNumber?: string;
   unitType?: UnitType;

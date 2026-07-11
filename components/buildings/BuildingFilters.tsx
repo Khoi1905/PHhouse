@@ -6,6 +6,22 @@ import { Search, X } from "lucide-react";
 import { DISTRICTS, UNIT_TYPES } from "@/lib/constants";
 import { Button } from "@/components/ui";
 
+// Bộ lọc hiện đơn vị "triệu đồng" cho gọn, nhưng URL/RPC vẫn luôn dùng VNĐ thật
+// (đúng đơn vị lưu trong units.price_month) — quy đổi chỉ xảy ra ở component này.
+function vndParamToTrieuStr(raw: string | null): string {
+  if (!raw) return "";
+  const vnd = Number(raw);
+  if (!Number.isFinite(vnd)) return "";
+  const trieu = Math.round((vnd / 1_000_000) * 100) / 100;
+  return String(trieu);
+}
+
+function trieuStrToVndParam(trieuStr: string): string {
+  const trieu = Number(trieuStr);
+  if (!trieuStr.trim() || !Number.isFinite(trieu)) return "";
+  return String(Math.round(trieu * 1_000_000));
+}
+
 export function BuildingFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -13,8 +29,8 @@ export function BuildingFilters() {
   const [district, setDistrict] = useState(searchParams.get("district") ?? "");
   const [ownerCode, setOwnerCode] = useState(searchParams.get("ownerCode") ?? "");
   const [keyword, setKeyword] = useState(searchParams.get("keyword") ?? "");
-  const [priceMin, setPriceMin] = useState(searchParams.get("priceMin") ?? "");
-  const [priceMax, setPriceMax] = useState(searchParams.get("priceMax") ?? "");
+  const [priceMin, setPriceMin] = useState(vndParamToTrieuStr(searchParams.get("priceMin")));
+  const [priceMax, setPriceMax] = useState(vndParamToTrieuStr(searchParams.get("priceMax")));
   const [unitTypes, setUnitTypes] = useState<string[]>(searchParams.getAll("unitType"));
 
   function toggleUnitType(t: string) {
@@ -26,8 +42,10 @@ export function BuildingFilters() {
     if (district) params.set("district", district);
     if (ownerCode) params.set("ownerCode", ownerCode);
     if (keyword) params.set("keyword", keyword);
-    if (priceMin) params.set("priceMin", priceMin);
-    if (priceMax) params.set("priceMax", priceMax);
+    const priceMinVnd = trieuStrToVndParam(priceMin);
+    const priceMaxVnd = trieuStrToVndParam(priceMax);
+    if (priceMinVnd) params.set("priceMin", priceMinVnd);
+    if (priceMaxVnd) params.set("priceMax", priceMaxVnd);
     unitTypes.forEach((t) => params.append("unitType", t));
     router.push(`/buildings?${params.toString()}`);
   }
@@ -90,9 +108,10 @@ export function BuildingFilters() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-[12.5px] font-semibold text-ink">Giá từ (VNĐ)</label>
+          <label className="mb-1.5 block text-[12.5px] font-semibold text-ink">Giá từ (triệu đồng)</label>
           <input
             type="number"
+            step="0.1"
             value={priceMin}
             onChange={(e) => setPriceMin(e.target.value)}
             placeholder="0"
@@ -100,12 +119,13 @@ export function BuildingFilters() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-[12.5px] font-semibold text-ink">Giá đến (VNĐ)</label>
+          <label className="mb-1.5 block text-[12.5px] font-semibold text-ink">Giá đến (triệu đồng)</label>
           <input
             type="number"
+            step="0.1"
             value={priceMax}
             onChange={(e) => setPriceMax(e.target.value)}
-            placeholder="15000000"
+            placeholder="15"
             className="w-full rounded-field border-[1.5px] border-line px-3 py-2.5 text-sm outline-none placeholder:text-placeholder focus:border-moss"
           />
         </div>

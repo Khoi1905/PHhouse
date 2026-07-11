@@ -6,7 +6,7 @@ export default async function OwnersPage() {
   const { data } = await supabase
     .from("owners")
     .select(
-      "id, owner_code, full_name, phone, phone_secondary, email, bank_account, id_number, note, buildings(count)"
+      "id, owner_code, full_name, phone, phone_secondary, email, bank_account, id_number, note, commission_sale_pct, commission_total_pct, buildings(count)"
     )
     .order("owner_code");
 
@@ -25,6 +25,8 @@ export default async function OwnersPage() {
       bank_account: o.bank_account,
       id_number: o.id_number,
       note: o.note,
+      commission_sale_pct: o.commission_sale_pct,
+      commission_total_pct: o.commission_total_pct,
       building_count,
     };
   });

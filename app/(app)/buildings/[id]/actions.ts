@@ -78,6 +78,8 @@ export async function updateBuildingAction(
       ward: v.ward || null,
       alley: v.alley || null,
       house_number: v.houseNumber || null,
+      guide_name: v.guideName || null,
+      guide_phone: v.guidePhone || null,
       note: v.buildingNote || null,
     })
     .eq("id", buildingId);

@@ -18,6 +18,8 @@ export type OwnerRow = {
   bank_account: string | null;
   id_number: string | null;
   note: string | null;
+  commission_sale_pct: number | null;
+  commission_total_pct: number | null;
   building_count: number;
 };
 
@@ -126,6 +128,8 @@ export function OwnersTable({ owners }: { owners: OwnerRow[] }) {
               bankAccount: editTarget.bank_account ?? "",
               idNumber: editTarget.id_number ?? "",
               ownerNote: editTarget.note ?? "",
+              commissionSalePct: editTarget.commission_sale_pct?.toString() ?? "",
+              commissionTotalPct: editTarget.commission_total_pct?.toString() ?? "",
             }}
             onSubmit={submitEdit}
             onCancel={() => setEditTarget(null)}

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { ownerEditSchema, type OwnerEditValues } from "@/lib/validation";
+import { parsePercent } from "@/lib/format";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -23,6 +24,8 @@ export async function updateOwnerAction(ownerId: string, values: OwnerEditValues
       bank_account: v.bankAccount || null,
       id_number: v.idNumber || null,
       note: v.ownerNote || null,
+      commission_sale_pct: parsePercent(v.commissionSalePct),
+      commission_total_pct: parsePercent(v.commissionTotalPct),
     })
     .eq("id", ownerId);
 

@@ -8,6 +8,8 @@ const SHEET_COLUMNS = [
   { header: "Phường/Xã", key: "ward", width: 18 },
   { header: "Ngõ/Ngách", key: "alley", width: 24 },
   { header: "Số nhà", key: "houseNumber", width: 12 },
+  { header: "Tên người dẫn", key: "guideName", width: 18 },
+  { header: "Số dẫn", key: "guidePhone", width: 16 },
   { header: "Số phòng", key: "roomNumber", width: 10 },
   { header: "Loại phòng", key: "unitType", width: 12 },
   { header: "Giá thuê/tháng (VNĐ)", key: "price", width: 18 },
@@ -15,6 +17,8 @@ const SHEET_COLUMNS = [
   { header: "Thông tin chi tiết", key: "details", width: 40 },
   { header: "Link Drive", key: "gdrive", width: 30 },
   { header: "Ghi chú", key: "note", width: 24 },
+  { header: "Hoa hồng cho sale (%)", key: "commissionSale", width: 18 },
+  { header: "Hoa hồng tổng (%)", key: "commissionTotal", width: 18 },
 ];
 
 /**
@@ -26,7 +30,10 @@ export async function buildOwnersWorkbook(
   supabase: SupabaseClient<Database>,
   ownerIds: string[] | null
 ) {
-  let ownerQuery = supabase.from("owners").select("id, owner_code, full_name").order("owner_code");
+  let ownerQuery = supabase
+    .from("owners")
+    .select("id, owner_code, full_name, commission_sale_pct, commission_total_pct")
+    .order("owner_code");
   if (ownerIds) ownerQuery = ownerQuery.in("id", ownerIds);
   const { data: owners } = await ownerQuery;
 
@@ -35,7 +42,7 @@ export async function buildOwnersWorkbook(
   const ids = owners.map((o) => o.id);
   const { data: buildings } = await supabase
     .from("buildings")
-    .select("id, owner_id, district, ward, alley, house_number")
+    .select("id, owner_id, district, ward, alley, house_number, guide_name, guide_phone")
     .in("owner_id", ids);
 
   const buildingIds = (buildings ?? []).map((b) => b.id);
@@ -75,6 +82,8 @@ export async function buildOwnersWorkbook(
           ward: b.ward ?? "",
           alley: b.alley ?? "",
           houseNumber: b.house_number ?? "",
+          guideName: b.guide_name ?? "",
+          guidePhone: b.guide_phone ?? "",
           roomNumber: u.room_number,
           unitType: u.unit_type,
           price: formatPrice(u.price_month),
@@ -82,6 +91,8 @@ export async function buildOwnersWorkbook(
           details: u.details_text ?? "",
           gdrive: u.gdrive_folder_link ?? "",
           note: u.note ?? "",
+          commissionSale: owner.commission_sale_pct ?? "",
+          commissionTotal: owner.commission_total_pct ?? "",
         });
       }
     }

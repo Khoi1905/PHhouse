@@ -13,7 +13,9 @@ export default async function OwnerDetailPage({ params }: { params: Promise<{ id
 
   const { data: owner } = await supabase
     .from("owners")
-    .select("id, owner_code, full_name, phone, phone_secondary, email, bank_account, id_number, note")
+    .select(
+      "id, owner_code, full_name, phone, phone_secondary, email, bank_account, id_number, note, commission_sale_pct, commission_total_pct"
+    )
     .eq("id", id)
     .single();
 
@@ -21,7 +23,7 @@ export default async function OwnerDetailPage({ params }: { params: Promise<{ id
 
   const { data: buildings } = await supabase
     .from("buildings")
-    .select("id, district, ward, alley, house_number")
+    .select("id, district, ward, alley, house_number, guide_name, guide_phone")
     .eq("owner_id", id)
     .order("district");
 
@@ -69,8 +71,12 @@ export default async function OwnerDetailPage({ params }: { params: Promise<{ id
           ward: building.ward,
           alley: building.alley,
           houseNumber: building.house_number,
+          guideName: building.guide_name,
+          guidePhone: building.guide_phone,
           ownerCode: owner.owner_code,
           ownerName: owner.full_name,
+          commissionSalePct: owner.commission_sale_pct,
+          commissionTotalPct: owner.commission_total_pct,
         };
         return (
           <div key={building.id} className="mb-8">

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { fullEntrySchema, type FullEntryFormValues } from "@/lib/validation";
+import { parsePercent } from "@/lib/format";
 
 export async function searchOwners(keyword: string) {
   if (!keyword.trim()) return [];
@@ -39,10 +40,14 @@ export async function createFullEntry(values: FullEntryFormValues): Promise<Crea
     p_owner_email: v.mode === "new" ? v.email ?? null : null,
     p_owner_bank_account: v.mode === "new" ? v.bankAccount ?? null : null,
     p_owner_note: v.mode === "new" ? v.ownerNote ?? null : null,
+    p_owner_commission_sale_pct: v.mode === "new" ? parsePercent(v.commissionSalePct) : null,
+    p_owner_commission_total_pct: v.mode === "new" ? parsePercent(v.commissionTotalPct) : null,
     p_district: v.district,
     p_ward: v.ward ?? null,
     p_alley: v.alley ?? null,
     p_house_number: v.houseNumber ?? null,
+    p_guide_name: v.guideName ?? null,
+    p_guide_phone: v.guidePhone ?? null,
     p_building_note: v.buildingNote ?? null,
     p_room_number: v.roomNumber,
     p_unit_type: v.unitType,

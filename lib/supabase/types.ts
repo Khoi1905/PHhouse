@@ -14,6 +14,8 @@ export type Database = {
           id_number: string | null;
           bank_account: string | null;
           note: string | null;
+          commission_sale_pct: number | null;
+          commission_total_pct: number | null;
           created_at: string;
           updated_at: string;
         };
@@ -27,6 +29,8 @@ export type Database = {
           id_number?: string | null;
           bank_account?: string | null;
           note?: string | null;
+          commission_sale_pct?: number | null;
+          commission_total_pct?: number | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -41,6 +45,8 @@ export type Database = {
           ward: string | null;
           alley: string | null;
           house_number: string | null;
+          guide_name: string | null;
+          guide_phone: string | null;
           note: string | null;
           created_at: string;
           updated_at: string;
@@ -52,6 +58,8 @@ export type Database = {
           ward?: string | null;
           alley?: string | null;
           house_number?: string | null;
+          guide_name?: string | null;
+          guide_phone?: string | null;
           note?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -134,6 +142,7 @@ export type Database = {
           id: string;
           owner_id: string;
           owner_code: string;
+          commission_sale_pct: number | null;
           district: District;
           ward: string | null;
           alley: string | null;
@@ -181,10 +190,14 @@ export type Database = {
           p_owner_email: string | null;
           p_owner_bank_account: string | null;
           p_owner_note: string | null;
+          p_owner_commission_sale_pct: number | null;
+          p_owner_commission_total_pct: number | null;
           p_district: string;
           p_ward: string | null;
           p_alley: string | null;
           p_house_number: string | null;
+          p_guide_name: string | null;
+          p_guide_phone: string | null;
           p_building_note: string | null;
           p_room_number: string;
           p_unit_type: string;

@@ -7,7 +7,7 @@ export const DISTRICTS = [
   "Thanh Oai", "Thường Tín", "Ứng Hòa", "Mê Linh", "Sơn Tây",
 ] as const;
 
-export const UNIT_TYPES = ["Studio", "1N1K", "2N1K", "Gác xép", "Giường tầng"] as const;
+export const UNIT_TYPES = ["Studio", "1N1K", "2N1K", "Gác xép", "Giường tầng", "Đơn-VSC"] as const;
 
 export const UNIT_STATUSES = ["Trống", "Full", "Giữa tháng trống", "Cuối tháng trống"] as const;
 

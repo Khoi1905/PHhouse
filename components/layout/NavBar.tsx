@@ -12,6 +12,9 @@ export function NavBar({ profile }: { profile: CurrentProfile }) {
 
   const navLinks = (
     <>
+      <Link href="/" className="hover:text-brand-orange" onClick={() => setOpen(false)}>
+        Trang chủ
+      </Link>
       <Link href="/buildings" className="hover:text-brand-orange" onClick={() => setOpen(false)}>
         Tra cứu phòng
       </Link>
@@ -59,7 +62,9 @@ export function NavBar({ profile }: { profile: CurrentProfile }) {
     <header className="border-b border-line bg-paper">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center gap-8">
-          <Logo size="sm" />
+          <Link href="/">
+            <Logo size="sm" />
+          </Link>
           <nav className="hidden items-center gap-5 text-sm font-semibold text-muted-2 md:flex">
             {navLinks}
           </nav>

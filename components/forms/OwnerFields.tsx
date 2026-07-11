@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { Field, TextInput, Textarea } from "@/components/ui";
+import { Field, TextInput, LockedInput, Textarea } from "@/components/ui";
 import { OwnerCombobox } from "./OwnerCombobox";
 import type { WizardFormValues } from "@/lib/validation";
 
@@ -74,6 +74,39 @@ export function OwnerFields() {
           <Field label="Số tài khoản ngân hàng" hint="Phục vụ đối soát ở giai đoạn sau">
             <TextInput placeholder="Không bắt buộc" {...register("bankAccount")} />
           </Field>
+
+          <Field label="Hoa hồng cho sale (%)" hint="Sale xem được — không bắt buộc">
+            <TextInput
+              type="number"
+              step="0.1"
+              min={0}
+              max={100}
+              placeholder="Không bắt buộc"
+              {...register("commissionSalePct")}
+            />
+          </Field>
+          {errors.commissionSalePct && (
+            <p className="-mt-3 mb-4 text-xs text-[#9C4A4A]">
+              {errors.commissionSalePct.message as string}
+            </p>
+          )}
+
+          <Field label="Hoa hồng tổng (%)" locked hint="Ẩn khỏi mọi tài khoản sale — không bắt buộc">
+            <LockedInput
+              type="number"
+              step="0.1"
+              min={0}
+              max={100}
+              placeholder="Không bắt buộc"
+              {...register("commissionTotalPct")}
+            />
+          </Field>
+          {errors.commissionTotalPct && (
+            <p className="-mt-3 mb-4 text-xs text-[#9C4A4A]">
+              {errors.commissionTotalPct.message as string}
+            </p>
+          )}
+
           <div className="sm:col-span-2">
             <Field label="Ghi chú nội bộ" hint="Tính cách, yêu cầu đặc biệt, lịch sử làm việc...">
               <Textarea rows={3} placeholder="Ghi chú..." {...register("ownerNote")} />

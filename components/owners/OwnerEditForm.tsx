@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Field, TextInput, Textarea, Button } from "@/components/ui";
+import { Field, TextInput, LockedInput, Textarea, Button } from "@/components/ui";
 import { ownerEditSchema, type OwnerEditValues } from "@/lib/validation";
 
 export function OwnerEditForm({
@@ -53,6 +53,14 @@ export function OwnerEditForm({
         <Field label="Số CMND/CCCD">
           <TextInput {...register("idNumber")} />
         </Field>
+
+        <Field label="Hoa hồng cho sale (%)" hint="Sale xem được">
+          <TextInput type="number" step="0.1" min={0} max={100} {...register("commissionSalePct")} />
+        </Field>
+        <Field label="Hoa hồng tổng (%)" locked hint="Ẩn khỏi mọi tài khoản sale">
+          <LockedInput type="number" step="0.1" min={0} max={100} {...register("commissionTotalPct")} />
+        </Field>
+
         <div className="sm:col-span-2">
           <Field label="Ghi chú nội bộ">
             <Textarea rows={3} {...register("ownerNote")} />
@@ -62,6 +70,9 @@ export function OwnerEditForm({
 
       {(errors.ownerCode || errors.fullName || errors.phone || errors.email) && (
         <p className="mb-3 text-xs text-[#9C4A4A]">Vui lòng kiểm tra lại các trường bắt buộc.</p>
+      )}
+      {(errors.commissionSalePct || errors.commissionTotalPct) && (
+        <p className="mb-3 text-xs text-[#9C4A4A]">% hoa hồng phải là số từ 0 đến 100.</p>
       )}
       {error && <p className="mb-3 rounded-field bg-danger-bg px-3 py-2 text-[13px] text-danger-fg">{error}</p>}
 
