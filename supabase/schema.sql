@@ -311,7 +311,30 @@ $$;
 --    thing instead of leaving an orphaned owner/building behind.
 --    SECURITY INVOKER (default) — runs as the calling admin, RLS/grants on
 --    owners/buildings/units still apply exactly as if inserted directly.
+--
+--    Its parameter list has grown a few times as fields were added. Postgres
+--    only lets CREATE OR REPLACE FUNCTION swap a function whose signature
+--    (arg count/types) is IDENTICAL — a changed signature creates a SEPARATE
+--    overload instead of replacing the old one, and then plain statements
+--    like `grant execute on function create_full_entry ...` fail with
+--    "function name is not unique". So: drop every existing overload of this
+--    function name first, unconditionally, before (re)creating the current
+--    one. Safe to run any time — DROP FUNCTION never touches table data.
 -- ----------------------------------------------------------------------------
+do $$
+declare
+  r record;
+begin
+  for r in
+    select p.oid::regprocedure as sig
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.proname = 'create_full_entry'
+  loop
+    execute format('drop function %s', r.sig);
+  end loop;
+end $$;
+
 create or replace function create_full_entry(
   p_owner_mode text,
   p_owner_id uuid,
