@@ -48,6 +48,7 @@ export type Database = {
           guide_name: string | null;
           guide_phone: string | null;
           access_type: AccessType | null;
+          pinned_at: string | null;
           note: string | null;
           created_at: string;
           updated_at: string;
@@ -62,6 +63,7 @@ export type Database = {
           guide_name?: string | null;
           guide_phone?: string | null;
           access_type?: AccessType | null;
+          pinned_at?: string | null;
           note?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -80,6 +82,7 @@ export type Database = {
           details_text: string | null;
           gdrive_folder_link: string | null;
           note: string | null;
+          pinned_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -93,6 +96,7 @@ export type Database = {
           details_text?: string | null;
           gdrive_folder_link?: string | null;
           note?: string | null;
+          pinned_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -174,6 +178,7 @@ export type Database = {
           alley: string | null;
           house_number: string | null;
           access_type: AccessType | null;
+          pinned_at: string | null;
           owner_id: string;
           owner_code: string;
           total_units: number;
@@ -197,6 +202,7 @@ export type Database = {
           district: District;
           alley: string | null;
           access_type: AccessType | null;
+          pinned_at: string | null;
           owner_code: string;
           room_number: string;
           unit_type: string;
@@ -206,6 +212,13 @@ export type Database = {
           gdrive_folder_link: string | null;
           note: string | null;
         }[];
+      };
+      set_building_pin: {
+        Args: {
+          p_building_id: string;
+          p_pin: boolean;
+        };
+        Returns: undefined;
       };
       auth_role: {
         Args: Record<string, never>;

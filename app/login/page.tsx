@@ -3,6 +3,7 @@
 import { useFormState, useFormStatus } from "react-dom";
 import { signIn } from "./actions";
 import { Logo } from "@/components/layout/Logo";
+import { ContactFooter } from "@/components/layout/ContactFooter";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -23,7 +24,7 @@ export default function LoginPage() {
   });
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-paper px-6">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-2 bg-paper px-6 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
           <Logo size="lg" className="mb-4 flex-col gap-2" />
@@ -70,6 +71,10 @@ export default function LoginPage() {
 
           <SubmitButton />
         </form>
+      </div>
+
+      <div className="w-full max-w-md">
+        <ContactFooter />
       </div>
     </div>
   );

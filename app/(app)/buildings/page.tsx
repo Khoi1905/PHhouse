@@ -53,7 +53,7 @@ export default async function BuildingsPage({
         </div>
 
         <BuildingFilters />
-        <UnitsSearchTable rows={rows} />
+        <UnitsSearchTable rows={rows} isAdmin={isAdmin} />
         <Pagination page={page} totalPages={totalPages} basePath="/buildings" />
       </div>
     );
@@ -77,7 +77,7 @@ export default async function BuildingsPage({
       </div>
 
       <BuildingFilters />
-      <BuildingsTable rows={rows} />
+      <BuildingsTable rows={rows} isAdmin={isAdmin} />
       <Pagination page={page} totalPages={totalPages} basePath="/buildings" />
     </div>
   );

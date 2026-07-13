@@ -2,12 +2,13 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Pencil, Trash2, Building2 } from "lucide-react";
+import { Lock, Pencil, Trash2, Building2, Star } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Button, Modal, ConfirmDialog } from "@/components/ui";
 import { BuildingFields } from "@/components/forms/BuildingFields";
 import { buildingStepSchema, type WizardFormValues } from "@/lib/validation";
 import { updateBuildingAction, deleteBuildingAction } from "@/app/(app)/buildings/[id]/actions";
+import { pinBuildingAction } from "@/app/(app)/buildings/actions";
 
 export type BuildingHeaderData = {
   id: string;
@@ -18,6 +19,7 @@ export type BuildingHeaderData = {
   guideName?: string | null;
   guidePhone?: string | null;
   accessType?: string | null;
+  pinnedAt?: string | null;
   ownerCode: string;
   ownerName?: string;
   commissionSalePct?: number | null;
@@ -75,6 +77,19 @@ export function BuildingHeader({ data, isAdmin }: { data: BuildingHeaderData; is
     });
   }
 
+  const isPinned = !!data.pinnedAt;
+
+  function togglePin() {
+    startTransition(async () => {
+      const res = await pinBuildingAction(data.id, !isPinned);
+      if (!res.ok) {
+        setError(res.error);
+        return;
+      }
+      router.refresh();
+    });
+  }
+
   const addressLine = [data.district, data.ward, data.alley].filter(Boolean).join(", ");
 
   return (
@@ -120,6 +135,10 @@ export function BuildingHeader({ data, isAdmin }: { data: BuildingHeaderData; is
 
         {isAdmin && (
           <div className="flex gap-2">
+            <Button variant="ghost" onClick={togglePin} disabled={pending}>
+              <Star size={14} className={isPinned ? "fill-brand-orange text-brand-orange" : ""} />
+              {isPinned ? "Bỏ ghim" : "Ghim tòa nhà"}
+            </Button>
             <Button variant="ghost" onClick={() => setEditOpen(true)}>
               <Pencil size={14} /> Sửa tòa nhà
             </Button>

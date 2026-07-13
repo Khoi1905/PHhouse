@@ -23,7 +23,7 @@ export default async function OwnerDetailPage({ params }: { params: Promise<{ id
 
   const { data: buildings } = await supabase
     .from("buildings")
-    .select("id, district, ward, alley, house_number, guide_name, guide_phone, access_type")
+    .select("id, district, ward, alley, house_number, guide_name, guide_phone, access_type, pinned_at")
     .eq("owner_id", id)
     .order("district");
 
@@ -31,7 +31,7 @@ export default async function OwnerDetailPage({ params }: { params: Promise<{ id
     (buildings ?? []).map(async (b) => {
       const { data: units } = await supabase
         .from("units")
-        .select("id, room_number, unit_type, price_month, status, details_text, gdrive_folder_link, note")
+        .select("id, room_number, unit_type, price_month, status, details_text, gdrive_folder_link, note, pinned_at")
         .eq("building_id", b.id)
         .order("room_number");
       return { building: b, units: units ?? [] };
@@ -74,6 +74,7 @@ export default async function OwnerDetailPage({ params }: { params: Promise<{ id
           guideName: building.guide_name,
           guidePhone: building.guide_phone,
           accessType: building.access_type,
+          pinnedAt: building.pinned_at,
           ownerCode: owner.owner_code,
           ownerName: owner.full_name,
           commissionSalePct: owner.commission_sale_pct,

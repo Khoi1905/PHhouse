@@ -18,7 +18,7 @@ export default async function BuildingDetailPage({ params }: { params: Promise<{
     const { data } = await supabase
       .from("buildings")
       .select(
-        "id, district, ward, alley, house_number, guide_name, guide_phone, access_type, owner_id, owners(owner_code, full_name, commission_sale_pct, commission_total_pct)"
+        "id, district, ward, alley, house_number, guide_name, guide_phone, access_type, pinned_at, owner_id, owners(owner_code, full_name, commission_sale_pct, commission_total_pct)"
       )
       .eq("id", id)
       .single();
@@ -34,6 +34,7 @@ export default async function BuildingDetailPage({ params }: { params: Promise<{
         guideName: data.guide_name,
         guidePhone: data.guide_phone,
         accessType: data.access_type,
+        pinnedAt: data.pinned_at,
         ownerCode: owner?.owner_code ?? "—",
         ownerName: owner?.full_name,
         commissionSalePct: owner?.commission_sale_pct,
@@ -65,7 +66,7 @@ export default async function BuildingDetailPage({ params }: { params: Promise<{
 
   const { data: units } = await supabase
     .from("units")
-    .select("id, room_number, unit_type, price_month, status, details_text, gdrive_folder_link, note")
+    .select("id, room_number, unit_type, price_month, status, details_text, gdrive_folder_link, note, pinned_at")
     .eq("building_id", id)
     .order("room_number");
 

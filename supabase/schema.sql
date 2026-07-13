@@ -64,21 +64,26 @@
     guide_phone text,
     -- Đặc điểm chung của cả tòa (không nhạy cảm) — sale xem được qua buildings_sale_view.
     access_type text check (access_type is null or access_type in ('Thang máy','Thang bộ')),
+    -- Ghim tòa: null = không ghim. Khi set, admin_full_access cascade set luôn
+    -- pinned_at cho các units còn trống của tòa (xem set_building_pin RPC).
+    pinned_at timestamptz,
     note text,
     created_at timestamptz default now(),
     updated_at timestamptz default now()
   );
 
-  -- Safety net for DBs where `buildings` already existed before access_type was
-  -- introduced: CREATE TABLE IF NOT EXISTS above is a no-op on those, so the
-  -- column must be added explicitly here — BEFORE buildings_sale_view (a real
-  -- view, resolved eagerly at creation time) references it below, or CREATE
-  -- VIEW fails with "column b.access_type does not exist". Harmless no-op on a
-  -- fresh DB where the column already came from the CREATE TABLE above.
+  -- Safety net for DBs where `buildings` already existed before access_type /
+  -- pinned_at were introduced: CREATE TABLE IF NOT EXISTS above is a no-op on
+  -- those, so the columns must be added explicitly here — BEFORE
+  -- buildings_sale_view (a real view, resolved eagerly at creation time) or
+  -- search_buildings reference them below, or CREATE VIEW fails with "column
+  -- b.access_type does not exist". Harmless no-op on a fresh DB where the
+  -- columns already came from the CREATE TABLE above.
   alter table buildings add column if not exists access_type text;
   alter table buildings drop constraint if exists buildings_access_type_check;
   alter table buildings add constraint buildings_access_type_check
     check (access_type is null or access_type in ('Thang máy','Thang bộ'));
+  alter table buildings add column if not exists pinned_at timestamptz;
 
   create table if not exists units (
     id uuid primary key default gen_random_uuid(),
@@ -90,9 +95,16 @@
     details_text text,
     gdrive_folder_link text,
     note text,
+    -- Ghim phòng: null = không ghim. Set trực tiếp khi ghim 1 phòng, hoặc cascade
+    -- từ set_building_pin khi ghim cả tòa. Không nhạy cảm — sale xem được.
+    pinned_at timestamptz,
     created_at timestamptz default now(),
     updated_at timestamptz default now()
   );
+
+  -- Safety net for DBs where `units` already existed before pinned_at was
+  -- introduced — same reasoning as buildings above.
+  alter table units add column if not exists pinned_at timestamptz;
 
   create table if not exists unit_history (
     id uuid primary key default gen_random_uuid(),
@@ -117,6 +129,10 @@
   create index if not exists idx_units_status on units(status);
   create index if not exists idx_units_unit_type on units(unit_type);
   create index if not exists idx_unit_history_unit_id on unit_history(unit_id);
+  -- Không thêm index cho pinned_at: search_buildings sort trên kết quả SAU
+  -- group by (index bảng gốc không giúp được), search_units sort nhiều khóa
+  -- xuyên bảng join (1 index đơn cột không thỏa được) — cả 2 đều luôn cần
+  -- Sort node riêng dù có index hay không, nên index chỉ tốn chi phí ghi.
 
   -- ----------------------------------------------------------------------------
   -- 2. updated_at auto-touch trigger (owners, buildings, units)
@@ -262,6 +278,10 @@
   --    SAME unit row). house_number is resolved server-side from auth_role()
   --    — never trust a client-supplied flag for this.
   --
+  --    Pinned buildings (pinned_at not null) sort first, most-recently-pinned
+  --    on top — but only WITHIN the already-filtered result set, never bypassing
+  --    the where clause above.
+  --
   --    Signature grows occasionally (e.g. access_type below) — same overload
   --    trap as create_full_entry, so drop every existing overload first.
   -- ----------------------------------------------------------------------------
@@ -295,6 +315,7 @@
     alley text,
     house_number text,
     access_type text,
+    pinned_at timestamptz,
     owner_id uuid,
     owner_code text,
     total_units bigint,
@@ -319,6 +340,7 @@
       b.alley,
       case when v_is_admin then b.house_number else null end as house_number,
       b.access_type,
+      b.pinned_at,
       b.owner_id,
       o.owner_code,
       count(u.id) as total_units,
@@ -347,7 +369,7 @@
         )
       )
     group by b.id, o.owner_code
-    order by b.district, b.ward;
+    order by (b.pinned_at is null), b.pinned_at desc, b.district, b.ward;
   end;
   $$;
 
@@ -365,6 +387,10 @@
   --    can't surface full rooms to a sale account. Same filters as
   --    search_buildings, but here type/price map 1:1 onto the returned rows,
   --    and the keyword also matches room_number.
+  --
+  --    Pinned units (pinned_at not null — set directly, or cascaded from
+  --    set_building_pin) sort first, most-recently-pinned on top, WITHIN the
+  --    already-filtered result set only.
   --
   --    Signature grows occasionally (e.g. access_type below) — drop every
   --    existing overload first, same trap as create_full_entry.
@@ -399,6 +425,7 @@
     district text,
     alley text,
     access_type text,
+    pinned_at timestamptz,
     owner_code text,
     room_number text,
     unit_type text,
@@ -426,6 +453,7 @@
       b.district,
       b.alley,
       b.access_type,
+      u.pinned_at,
       o.owner_code,
       u.room_number,
       u.unit_type,
@@ -454,7 +482,41 @@
       and (p_statuses is null or u.status = any(p_statuses))
       -- Sale never sees full rooms, enforced regardless of the params above.
       and (v_role = 'admin' or u.status <> 'Full')
-    order by b.district, b.alley nulls last, u.room_number;
+    order by (u.pinned_at is null), u.pinned_at desc, b.district, b.alley nulls last, u.room_number;
+  end;
+  $$;
+
+  -- ----------------------------------------------------------------------------
+  -- 7c. set_building_pin — ghim/bỏ ghim cả tòa từ danh sách /buildings.
+  --    SECURITY INVOKER (default) — RLS on buildings/units still applies as the
+  --    calling admin, plus an explicit auth_role() check for a clear error.
+  --    Cascades to every unit of the building whose status is NOT 'Full' (i.e.
+  --    still bookable), so sale's room search always surfaces them. Symmetric:
+  --    unpinning the building also unpins those same units.
+  -- ----------------------------------------------------------------------------
+  create or replace function set_building_pin(
+    p_building_id uuid,
+    p_pin boolean
+  )
+  returns void
+  language plpgsql
+  set search_path = public
+  as $$
+  declare
+    v_pinned_at timestamptz := case when p_pin then now() else null end;
+  begin
+    if auth_role() <> 'admin' then
+      raise exception 'not authorized';
+    end if;
+
+    update buildings set pinned_at = v_pinned_at where id = p_building_id;
+
+    -- status <> 'Full' (khớp cách search_units xác định "còn trống") thay vì
+    -- liệt kê cứng từng trạng thái — tự đúng nếu sau này thêm trạng thái mới,
+    -- không cần nhớ sửa thêm chỗ này.
+    update units set pinned_at = v_pinned_at
+    where building_id = p_building_id
+      and status <> 'Full';
   end;
   $$;
 
@@ -567,6 +629,7 @@
   grant select on buildings_sale_view to authenticated;
   grant execute on function search_buildings to authenticated;
   grant execute on function search_units to authenticated;
+  grant execute on function set_building_pin to authenticated;
   grant execute on function auth_role to authenticated;
   grant execute on function create_full_entry to authenticated;
 
@@ -622,6 +685,10 @@
   -- Migration (2026-07-13) thêm "Thang máy / Thang bộ" cho buildings đã được
   -- gộp lên section 1 (ngay sau CREATE TABLE buildings) — bắt buộc phải chạy
   -- SỚM vì buildings_sale_view bên dưới tham chiếu tới cột này ngay khi tạo.
+
+  -- Migration (2026-07-13) thêm "Ghim tòa/phòng" (pinned_at trên buildings và
+  -- units) cũng đã được gộp lên section 1, ngay sau CREATE TABLE tương ứng —
+  -- cùng lý do idempotent-early-alter như trên.
 
   -- ============================================================================
   -- Bootstrap: tạo tài khoản admin đầu tiên (một lần, thủ công)
