@@ -38,3 +38,4 @@ next-env.d.ts
 # internal dev docs, not for the repo
 tutorial.md
 context.md
+.codex/

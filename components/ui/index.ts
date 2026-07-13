@@ -11,3 +11,4 @@ export { ConfirmDialog } from "./ConfirmDialog";
 export { SlideOver } from "./SlideOver";
 export { Modal } from "./Modal";
 export { Pagination } from "./Pagination";
+export { MultiSelectDropdown } from "./MultiSelectDropdown";

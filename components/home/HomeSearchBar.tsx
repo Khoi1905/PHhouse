@@ -3,17 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import { Select, Button } from "@/components/ui";
+import { Select, Button, MultiSelectDropdown } from "@/components/ui";
 import { DISTRICTS, UNIT_TYPES } from "@/lib/constants";
 
 export function HomeSearchBar() {
   const router = useRouter();
-  const [district, setDistrict] = useState("");
+  const [districts, setDistricts] = useState<string[]>([]);
   const [unitType, setUnitType] = useState("");
 
   function handleSearch() {
     const params = new URLSearchParams();
-    if (district) params.set("district", district);
+    districts.forEach((d) => params.append("district", d));
     if (unitType) params.set("unitType", unitType);
     const query = params.toString();
     router.push(query ? `/buildings?${query}` : "/buildings");
@@ -23,7 +23,7 @@ export function HomeSearchBar() {
     <div className="flex flex-col gap-3 rounded-card border-[1.5px] border-line bg-white p-4 sm:flex-row sm:items-end sm:p-5">
       <div className="flex-1">
         <label className="mb-1.5 block text-[12.5px] font-semibold text-ink">Quận / Huyện</label>
-        <Select options={DISTRICTS} value={district} onChange={(e) => setDistrict(e.target.value)} />
+        <MultiSelectDropdown options={DISTRICTS} selected={districts} onChange={setDistricts} />
       </div>
       <div className="flex-1">
         <label className="mb-1.5 block text-[12.5px] font-semibold text-ink">Loại phòng</label>

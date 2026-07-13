@@ -1,16 +1,18 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Zap, History, type LucideIcon } from "lucide-react";
 import { getCurrentProfile } from "@/lib/supabase/profile";
 import { Logo } from "@/components/layout/Logo";
 import { HomeSearchBar } from "@/components/home/HomeSearchBar";
 import { ContactValueCards } from "@/components/home/ContactValueCards";
 
-type ValueProp = { icon: LucideIcon; title: string; description: string };
+type ValueProp = { icon: LucideIcon; title: string; description: string; href?: string };
 
 const FIRST_VALUE_PROP: ValueProp = {
   icon: Zap,
   title: "Tra cứu tức thì",
   description: "Lọc theo quận/huyện, giá, loại phòng chỉ trong vài giây.",
+  href: "/buildings?view=units",
 };
 
 // Chỉ admin thấy — gate bằng isAdmin && ở JSX bên dưới.
@@ -22,15 +24,28 @@ const LAST_VALUE_PROP: ValueProp = {
 
 function ValuePropCard({ prop }: { prop: ValueProp }) {
   const Icon = prop.icon;
-  return (
-    <div className="rounded-card border-[1.5px] border-line bg-white p-5">
+  const content = (
+    <>
       <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-[9px] bg-brand-orange text-white">
         <Icon size={18} strokeWidth={2.2} />
       </div>
       <h3 className="font-display text-base font-semibold text-ink">{prop.title}</h3>
       <p className="mt-1 text-[13px] leading-relaxed text-muted-2">{prop.description}</p>
-    </div>
+    </>
   );
+
+  if (prop.href) {
+    return (
+      <Link
+        href={prop.href}
+        className="rounded-card border-[1.5px] border-line bg-white p-5 text-left transition-colors hover:border-moss"
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className="rounded-card border-[1.5px] border-line bg-white p-5">{content}</div>;
 }
 
 export default async function HomePage() {

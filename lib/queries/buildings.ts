@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/types";
 
 export type BuildingSearchFilters = {
-  district?: string;
+  districts?: string[];
   ownerCode?: string;
   keyword?: string;
   priceMin?: number;
@@ -26,7 +26,7 @@ export async function searchBuildings(
     .rpc(
       "search_buildings",
       {
-        p_district: filters.district || null,
+        p_districts: filters.districts && filters.districts.length > 0 ? filters.districts : null,
         p_owner_code: filters.ownerCode || null,
         p_keyword: filters.keyword || null,
         p_price_min: filters.priceMin ?? null,
@@ -46,7 +46,7 @@ export async function searchBuildings(
 }
 
 export type UnitSearchFilters = {
-  district?: string;
+  districts?: string[];
   ownerCode?: string;
   keyword?: string;
   priceMin?: number;
@@ -73,7 +73,7 @@ export async function searchUnits(
     .rpc(
       "search_units",
       {
-        p_district: filters.district || null,
+        p_districts: filters.districts && filters.districts.length > 0 ? filters.districts : null,
         p_owner_code: filters.ownerCode || null,
         p_keyword: filters.keyword || null,
         p_price_min: filters.priceMin ?? null,

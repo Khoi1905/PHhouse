@@ -273,6 +273,16 @@ export function UnitsTable({
       >
         {slideOverUnit && (
           <div className="space-y-4">
+            {slideOverUnit.gdrive_folder_link && (
+              <a
+                href={slideOverUnit.gdrive_folder_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-field bg-brand-orange px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-orange-dark"
+              >
+                <ExternalLink size={16} /> Mở album ảnh
+              </a>
+            )}
             <div>
               <p className="mb-1 text-[12.5px] font-semibold text-ink">Thông tin chi tiết</p>
               <p className="whitespace-pre-line text-sm leading-relaxed text-muted-2">
@@ -284,16 +294,6 @@ export function UnitsTable({
                 <p className="mb-1 text-[12.5px] font-semibold text-ink">Ghi chú nội bộ</p>
                 <p className="whitespace-pre-line text-sm leading-relaxed text-muted-2">{slideOverUnit.note}</p>
               </div>
-            )}
-            {slideOverUnit.gdrive_folder_link && (
-              <a
-                href={slideOverUnit.gdrive_folder_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-moss hover:underline"
-              >
-                <ExternalLink size={14} /> Mở album ảnh
-              </a>
             )}
           </div>
         )}

@@ -29,7 +29,7 @@ export default function LoginPage() {
         <div className="mb-8 flex flex-col items-center text-center">
           <Logo size="lg" className="mb-4 flex-col gap-2" />
           <h1 className="font-display text-3xl font-bold text-ink">Đăng nhập</h1>
-          <p className="mt-2 text-sm text-muted-2">
+          <p className="mt-2 text-base font-semibold text-ink sm:text-lg">
             Hệ thống quản lý &amp; tra cứu căn hộ dịch vụ
           </p>
         </div>

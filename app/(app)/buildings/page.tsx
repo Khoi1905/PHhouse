@@ -15,7 +15,7 @@ export default async function BuildingsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
-  const district = typeof sp.district === "string" ? sp.district : undefined;
+  const districts = sp.district ? (Array.isArray(sp.district) ? sp.district : [sp.district]) : undefined;
   const ownerCode = typeof sp.ownerCode === "string" ? sp.ownerCode : undefined;
   const keyword = typeof sp.keyword === "string" ? sp.keyword : undefined;
   const priceMin = typeof sp.priceMin === "string" ? Number(sp.priceMin) : undefined;
@@ -32,7 +32,7 @@ export default async function BuildingsPage({
 
   const supabase = await createClient();
 
-  const commonFilters = { district, ownerCode, keyword, priceMin, priceMax, unitTypes, accessType };
+  const commonFilters = { districts, ownerCode, keyword, priceMin, priceMax, unitTypes, accessType };
 
   if (mode === "units") {
     const { rows, count } = await searchUnits(supabase, {

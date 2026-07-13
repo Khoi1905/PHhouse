@@ -300,7 +300,7 @@
   end $$;
 
   create or replace function search_buildings(
-    p_district text default null,
+    p_districts text[] default null,
     p_owner_code text default null,
     p_keyword text default null,
     p_price_min numeric default null,
@@ -349,7 +349,7 @@
     join owners o on o.id = b.owner_id
     left join units u on u.building_id = b.id
     where
-      (p_district is null or b.district = p_district)
+      (p_districts is null or b.district = any(p_districts))
       and (p_owner_code is null or p_owner_code = '' or o.owner_code ilike '%' || p_owner_code || '%')
       and (p_access_type is null or b.access_type = p_access_type)
       and (
@@ -410,7 +410,7 @@
   end $$;
 
   create or replace function search_units(
-    p_district text default null,
+    p_districts text[] default null,
     p_owner_code text default null,
     p_keyword text default null,
     p_price_min numeric default null,
@@ -466,7 +466,7 @@
     join buildings b on b.id = u.building_id
     join owners o on o.id = b.owner_id
     where
-      (p_district is null or b.district = p_district)
+      (p_districts is null or b.district = any(p_districts))
       and (p_owner_code is null or p_owner_code = '' or o.owner_code ilike '%' || p_owner_code || '%')
       and (p_access_type is null or b.access_type = p_access_type)
       and (

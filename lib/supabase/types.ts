@@ -163,7 +163,7 @@ export type Database = {
     Functions: {
       search_buildings: {
         Args: {
-          p_district?: string | null;
+          p_districts?: string[] | null;
           p_owner_code?: string | null;
           p_keyword?: string | null;
           p_price_min?: number | null;
@@ -187,7 +187,7 @@ export type Database = {
       };
       search_units: {
         Args: {
-          p_district?: string | null;
+          p_districts?: string[] | null;
           p_owner_code?: string | null;
           p_keyword?: string | null;
           p_price_min?: number | null;

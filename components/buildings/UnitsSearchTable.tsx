@@ -123,6 +123,17 @@ export function UnitsSearchTable({ rows, isAdmin }: { rows: UnitSearchRow[]; isA
       >
         {slideOverUnit && (
           <div className="space-y-4">
+            {slideOverUnit.gdrive_folder_link && (
+              <a
+                href={slideOverUnit.gdrive_folder_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-field bg-brand-orange px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-orange-dark"
+              >
+                <ExternalLink size={16} /> Mở album ảnh
+              </a>
+            )}
+
             <div className="flex flex-wrap items-center gap-2">
               <StatusPill status={slideOverUnit.status} />
               {slideOverUnit.pinned_at && (
@@ -152,17 +163,6 @@ export function UnitsSearchTable({ rows, isAdmin }: { rows: UnitSearchRow[]; isA
                   {slideOverUnit.note}
                 </p>
               </div>
-            )}
-
-            {slideOverUnit.gdrive_folder_link && (
-              <a
-                href={slideOverUnit.gdrive_folder_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-moss hover:underline"
-              >
-                <ExternalLink size={14} /> Mở album ảnh
-              </a>
             )}
           </div>
         )}

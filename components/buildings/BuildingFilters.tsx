@@ -4,14 +4,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Search, X } from "lucide-react";
 import { DISTRICTS, UNIT_TYPES, ACCESS_TYPES } from "@/lib/constants";
-import { Button } from "@/components/ui";
+import { Button, MultiSelectDropdown } from "@/components/ui";
 import { vndToTrieuStr, trieuStrToVnd } from "@/lib/format";
 
 export function BuildingFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [district, setDistrict] = useState(searchParams.get("district") ?? "");
+  const [districts, setDistricts] = useState<string[]>(searchParams.getAll("district"));
   const [ownerCode, setOwnerCode] = useState(searchParams.get("ownerCode") ?? "");
   const [keyword, setKeyword] = useState(searchParams.get("keyword") ?? "");
   const [priceMin, setPriceMin] = useState(vndToTrieuStr(searchParams.get("priceMin")));
@@ -28,7 +28,7 @@ export function BuildingFilters() {
     // Giữ chế độ xem theo tòa/phòng (admin) khi áp dụng bộ lọc.
     const view = searchParams.get("view");
     if (view) params.set("view", view);
-    if (district) params.set("district", district);
+    districts.forEach((d) => params.append("district", d));
     if (ownerCode) params.set("ownerCode", ownerCode);
     if (keyword) params.set("keyword", keyword);
     const priceMinVnd = trieuStrToVnd(priceMin);
@@ -41,7 +41,7 @@ export function BuildingFilters() {
   }
 
   function clearAll() {
-    setDistrict("");
+    setDistricts([]);
     setOwnerCode("");
     setKeyword("");
     setPriceMin("");
@@ -53,27 +53,14 @@ export function BuildingFilters() {
   }
 
   const hasFilters =
-    district || ownerCode || keyword || priceMin || priceMax || unitTypes.length > 0 || accessType;
+    districts.length > 0 || ownerCode || keyword || priceMin || priceMax || unitTypes.length > 0 || accessType;
 
   return (
     <div className="mb-6 rounded-card border-[1.5px] border-line bg-white p-5">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <label className="mb-1.5 block text-[12.5px] font-semibold text-ink">Quận / Huyện</label>
-          <div className="relative">
-            <select
-              value={district}
-              onChange={(e) => setDistrict(e.target.value)}
-              className="w-full appearance-none rounded-field border-[1.5px] border-line bg-white px-3 py-2.5 text-sm text-ink outline-none focus:border-moss"
-            >
-              <option value="">Tất cả</option>
-              {DISTRICTS.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </div>
+          <MultiSelectDropdown options={DISTRICTS} selected={districts} onChange={setDistricts} />
         </div>
 
         <div>
