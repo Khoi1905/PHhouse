@@ -7,7 +7,7 @@ import { Check, ExternalLink, History, Pencil, Plus, SquarePen, Trash2, X } from
 import { Button, ConfirmDialog, Modal, SlideOver, StatusPill } from "@/components/ui";
 import { UnitFields } from "@/components/forms/UnitFields";
 import { UNIT_STATUSES, type UnitStatus } from "@/lib/constants";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, vndToTrieuStr, trieuStrToVnd } from "@/lib/format";
 import { unitStepSchema, type WizardFormValues } from "@/lib/validation";
 import {
   deleteUnitAction,
@@ -127,10 +127,12 @@ export function UnitsTable({
                     {editing ? (
                       <input
                         type="number"
-                        value={quickValues.priceMonth}
+                        step="0.1"
+                        value={vndToTrieuStr(quickValues.priceMonth)}
                         onChange={(e) =>
-                          setQuickValues((v) => ({ ...v, priceMonth: Number(e.target.value) }))
+                          setQuickValues((v) => ({ ...v, priceMonth: trieuStrToVnd(e.target.value) ?? 0 }))
                         }
+                        placeholder="7.5"
                         className="w-28 rounded-field border-[1.5px] border-line px-2 py-1 text-sm outline-none focus:border-moss"
                       />
                     ) : (

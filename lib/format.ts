@@ -18,6 +18,23 @@ export function stripDiacritics(input: string): string {
     .toLowerCase();
 }
 
+// Giá thuê lưu trong DB luôn là VNĐ thô (units.price_month). Các hàm dưới đây
+// chỉ dùng để quy đổi hiển thị/nhập liệu sang "triệu đồng" cho gọn — không
+// được dùng để đổi đơn vị lưu trữ hay giá trị gửi lên server/RPC.
+export function vndToTrieuStr(raw: string | number | null | undefined): string {
+  if (raw === null || raw === undefined || raw === "") return "";
+  const vnd = Number(raw);
+  if (!Number.isFinite(vnd)) return "";
+  const trieu = Math.round((vnd / 1_000_000) * 100) / 100;
+  return String(trieu);
+}
+
+export function trieuStrToVnd(trieuStr: string): number | null {
+  const trieu = Number(trieuStr);
+  if (!trieuStr.trim() || !Number.isFinite(trieu)) return null;
+  return Math.round(trieu * 1_000_000);
+}
+
 export function parsePercent(raw?: string): number | null {
   if (!raw || !raw.trim()) return null;
   const n = Number(raw);

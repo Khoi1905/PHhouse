@@ -4,6 +4,7 @@ import { useFormContext, Controller } from "react-hook-form";
 import { Link as LinkIcon } from "lucide-react";
 import { Field, TextInput, Select, Textarea, StatusPicker } from "@/components/ui";
 import { UNIT_TYPES } from "@/lib/constants";
+import { vndToTrieuStr, trieuStrToVnd } from "@/lib/format";
 import type { WizardFormValues } from "@/lib/validation";
 
 export function UnitFields() {
@@ -23,12 +24,20 @@ export function UnitFields() {
           <Select options={UNIT_TYPES} {...register("unitType")} />
         </Field>
 
-        <Field label="Giá thuê / tháng (VNĐ)" required hint="Dùng để sale lọc theo khoảng giá">
-          <TextInput
-            type="number"
-            min={0}
-            placeholder="7500000"
-            {...register("priceMonth", { valueAsNumber: true })}
+        <Field label="Giá thuê / tháng (triệu đồng)" required hint="Dùng để sale lọc theo khoảng giá">
+          <Controller
+            control={control}
+            name="priceMonth"
+            render={({ field }) => (
+              <TextInput
+                type="number"
+                step="0.1"
+                min={0}
+                placeholder="7.5"
+                value={vndToTrieuStr(field.value)}
+                onChange={(e) => field.onChange(trieuStrToVnd(e.target.value) ?? undefined)}
+              />
+            )}
           />
         </Field>
         <Field label="Tình trạng" required>
