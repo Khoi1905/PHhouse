@@ -1,5 +1,14 @@
 import { z } from "zod";
-import { DISTRICTS, UNIT_TYPES, UNIT_STATUSES, type District, type UnitType, type UnitStatus } from "./constants";
+import {
+  DISTRICTS,
+  UNIT_TYPES,
+  UNIT_STATUSES,
+  ACCESS_TYPES,
+  type District,
+  type UnitType,
+  type UnitStatus,
+  type AccessType,
+} from "./constants";
 
 // % hoa hồng nhập dạng chuỗi (giống các field optional khác), chỉ validate là
 // số 0-100 khi có giá trị — để trống thì bỏ qua, convert sang number | null
@@ -55,6 +64,7 @@ export const buildingStepSchema = z.object({
   houseNumber: z.string().optional(),
   guideName: z.string().optional(),
   guidePhone: z.string().optional(),
+  accessType: z.enum(ACCESS_TYPES).optional().or(z.literal("")),
   buildingNote: z.string().optional(),
 });
 export type BuildingStepValues = z.infer<typeof buildingStepSchema>;
@@ -101,6 +111,7 @@ export type WizardFormValues = {
   houseNumber?: string;
   guideName?: string;
   guidePhone?: string;
+  accessType?: AccessType | "";
   buildingNote?: string;
   roomNumber?: string;
   unitType?: UnitType;

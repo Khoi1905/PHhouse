@@ -7,6 +7,7 @@ export type BuildingRow = {
   district: string;
   ward: string | null;
   alley: string | null;
+  access_type: string | null;
   owner_code: string;
   total_units: number;
   vacant_units: number;
@@ -31,6 +32,7 @@ export function BuildingsTable({ rows }: { rows: BuildingRow[] }) {
             <th className="px-4 py-3">Quận / Huyện</th>
             <th className="px-4 py-3">Phường / Xã</th>
             <th className="px-4 py-3">Ngõ / Ngách</th>
+            <th className="px-4 py-3">Thang máy/bộ</th>
             <th className="px-4 py-3">Mã chủ</th>
             <th className="px-4 py-3">Số phòng (tổng / trống)</th>
           </tr>
@@ -45,6 +47,7 @@ export function BuildingsTable({ rows }: { rows: BuildingRow[] }) {
               <td className="px-4 py-3 text-ink">{r.district}</td>
               <td className="px-4 py-3 text-ink">{r.ward || "—"}</td>
               <td className="px-4 py-3 text-muted-2">{r.alley || "—"}</td>
+              <td className="px-4 py-3 text-muted-2">{r.access_type || "—"}</td>
               <td className="px-4 py-3 font-semibold text-ink">{r.owner_code}</td>
               <td className="px-4 py-3 text-ink">
                 {r.total_units} / <span className="text-moss">{r.vacant_units} trống</span>

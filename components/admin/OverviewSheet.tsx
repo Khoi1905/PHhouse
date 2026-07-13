@@ -15,6 +15,7 @@ export type OverviewRow = {
   houseNumber: string | null;
   guideName: string | null;
   guidePhone: string | null;
+  accessType: string | null;
   unitId: string;
   roomNumber: string;
   unitType: string;
@@ -222,6 +223,7 @@ export function OverviewSheet({ sheets }: { sheets: OwnerSheet[] }) {
                             <Lock size={10} /> Số dẫn
                           </span>
                         </th>
+                        <th className="border-b border-r border-line px-3 py-2">Thang máy/bộ</th>
                         <th className="border-b border-r border-line px-3 py-2">Số phòng</th>
                         <th className="border-b border-r border-line px-3 py-2">Loại</th>
                         <th className="border-b border-r border-line px-3 py-2">Giá/tháng</th>
@@ -244,6 +246,9 @@ export function OverviewSheet({ sheets }: { sheets: OwnerSheet[] }) {
                           </td>
                           <td className="border-b border-r border-line px-3 py-2 text-sale-lock">
                             {r.guidePhone || "—"}
+                          </td>
+                          <td className="border-b border-r border-line px-3 py-2 text-ink">
+                            {r.accessType || "—"}
                           </td>
                           <td className="border-b border-r border-line px-3 py-2 font-semibold text-ink">
                             {r.roomNumber}

@@ -17,6 +17,7 @@ export type BuildingHeaderData = {
   houseNumber: string | null;
   guideName?: string | null;
   guidePhone?: string | null;
+  accessType?: string | null;
   ownerCode: string;
   ownerName?: string;
   commissionSalePct?: number | null;
@@ -40,6 +41,7 @@ export function BuildingHeader({ data, isAdmin }: { data: BuildingHeaderData; is
       houseNumber: data.houseNumber ?? "",
       guideName: data.guideName ?? "",
       guidePhone: data.guidePhone ?? "",
+      accessType: (data.accessType as WizardFormValues["accessType"]) ?? "",
     },
   });
 
@@ -101,6 +103,9 @@ export function BuildingHeader({ data, isAdmin }: { data: BuildingHeaderData; is
               Chủ sở hữu: <span className="font-semibold text-ink">{data.ownerCode}</span>
               {isAdmin && data.ownerName ? ` — ${data.ownerName}` : ""}
             </p>
+            {data.accessType && (
+              <p className="mt-1 text-sm text-muted-2">{data.accessType}</p>
+            )}
             {data.commissionSalePct != null && (
               <p className="mt-1 text-sm text-muted-2">Hoa hồng cho sale: {data.commissionSalePct}%</p>
             )}

@@ -80,6 +80,7 @@ export async function updateBuildingAction(
       house_number: v.houseNumber || null,
       guide_name: v.guideName || null,
       guide_phone: v.guidePhone || null,
+      access_type: v.accessType || null,
       note: v.buildingNote || null,
     })
     .eq("id", buildingId);

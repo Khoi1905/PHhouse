@@ -1,4 +1,4 @@
-import type { District, UnitStatus, UnitType } from "@/lib/constants";
+import type { District, UnitStatus, UnitType, AccessType } from "@/lib/constants";
 
 export type Database = {
   public: {
@@ -47,6 +47,7 @@ export type Database = {
           house_number: string | null;
           guide_name: string | null;
           guide_phone: string | null;
+          access_type: AccessType | null;
           note: string | null;
           created_at: string;
           updated_at: string;
@@ -60,6 +61,7 @@ export type Database = {
           house_number?: string | null;
           guide_name?: string | null;
           guide_phone?: string | null;
+          access_type?: AccessType | null;
           note?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -146,6 +148,7 @@ export type Database = {
           district: District;
           ward: string | null;
           alley: string | null;
+          access_type: AccessType | null;
           note: string | null;
           created_at: string;
           updated_at: string;
@@ -162,6 +165,7 @@ export type Database = {
           p_price_min?: number | null;
           p_price_max?: number | null;
           p_unit_types?: string[] | null;
+          p_access_type?: string | null;
         };
         Returns: {
           id: string;
@@ -169,10 +173,38 @@ export type Database = {
           ward: string | null;
           alley: string | null;
           house_number: string | null;
+          access_type: AccessType | null;
           owner_id: string;
           owner_code: string;
           total_units: number;
           vacant_units: number;
+        }[];
+      };
+      search_units: {
+        Args: {
+          p_district?: string | null;
+          p_owner_code?: string | null;
+          p_keyword?: string | null;
+          p_price_min?: number | null;
+          p_price_max?: number | null;
+          p_unit_types?: string[] | null;
+          p_statuses?: string[] | null;
+          p_access_type?: string | null;
+        };
+        Returns: {
+          id: string;
+          building_id: string;
+          district: District;
+          alley: string | null;
+          access_type: AccessType | null;
+          owner_code: string;
+          room_number: string;
+          unit_type: string;
+          price_month: number;
+          status: UnitStatus;
+          details_text: string | null;
+          gdrive_folder_link: string | null;
+          note: string | null;
         }[];
       };
       auth_role: {
@@ -198,6 +230,7 @@ export type Database = {
           p_house_number: string | null;
           p_guide_name: string | null;
           p_guide_phone: string | null;
+          p_access_type: string | null;
           p_building_note: string | null;
           p_room_number: string;
           p_unit_type: string;

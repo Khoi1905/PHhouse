@@ -2,7 +2,7 @@
 
 import { useFormContext } from "react-hook-form";
 import { Field, TextInput, LockedInput, Select, Textarea } from "@/components/ui";
-import { DISTRICTS } from "@/lib/constants";
+import { DISTRICTS, ACCESS_TYPES } from "@/lib/constants";
 import type { WizardFormValues } from "@/lib/validation";
 
 export function BuildingFields() {
@@ -34,6 +34,10 @@ export function BuildingFields() {
       </Field>
       <Field label="Số dẫn" locked hint="SĐT người dẫn sale đi xem phòng — ẩn khỏi sale">
         <LockedInput placeholder="0912 345 678" {...register("guidePhone")} />
+      </Field>
+
+      <Field label="Thang máy / Thang bộ" hint="Áp dụng chung cho cả tòa, sale xem được">
+        <Select options={ACCESS_TYPES} {...register("accessType")} />
       </Field>
 
       <div className="sm:col-span-2">

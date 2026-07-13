@@ -21,6 +21,7 @@ type RawBuilding = {
   house_number: string | null;
   guide_name: string | null;
   guide_phone: string | null;
+  access_type: string | null;
   units: RawUnit[];
 };
 
@@ -39,7 +40,7 @@ export default async function AdminOverviewPage() {
     .from("owners")
     .select(
       `id, owner_code, full_name, commission_sale_pct, commission_total_pct,
-       buildings ( id, district, ward, alley, house_number, guide_name, guide_phone,
+       buildings ( id, district, ward, alley, house_number, guide_name, guide_phone, access_type,
          units ( id, room_number, unit_type, price_month, status, details_text, gdrive_folder_link, note ) )`
     )
     .order("owner_code")
@@ -60,6 +61,7 @@ export default async function AdminOverviewPage() {
         houseNumber: b.house_number,
         guideName: b.guide_name,
         guidePhone: b.guide_phone,
+        accessType: b.access_type,
         unitId: u.id,
         roomNumber: u.room_number,
         unitType: u.unit_type,

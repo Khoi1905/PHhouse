@@ -9,6 +9,8 @@ export const DISTRICTS = [
 
 export const UNIT_TYPES = ["Studio", "1N1K", "2N1K", "Gác xép", "Giường tầng", "Đơn-VSC"] as const;
 
+export const ACCESS_TYPES = ["Thang máy", "Thang bộ"] as const;
+
 export const UNIT_STATUSES = ["Trống", "Full", "Giữa tháng trống", "Cuối tháng trống"] as const;
 
 // 3 trạng thái được tính là "trống" trong số đếm ở /buildings (sale có thể tư vấn ngay).
@@ -24,3 +26,4 @@ export const STATUS_STYLES: Record<(typeof UNIT_STATUSES)[number], { bg: string;
 export type District = (typeof DISTRICTS)[number];
 export type UnitType = (typeof UNIT_TYPES)[number];
 export type UnitStatus = (typeof UNIT_STATUSES)[number];
+export type AccessType = (typeof ACCESS_TYPES)[number];

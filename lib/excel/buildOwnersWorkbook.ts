@@ -10,6 +10,7 @@ const SHEET_COLUMNS = [
   { header: "Số nhà", key: "houseNumber", width: 12 },
   { header: "Tên người dẫn", key: "guideName", width: 18 },
   { header: "Số dẫn", key: "guidePhone", width: 16 },
+  { header: "Thang máy/bộ", key: "accessType", width: 14 },
   { header: "Số phòng", key: "roomNumber", width: 10 },
   { header: "Loại phòng", key: "unitType", width: 12 },
   { header: "Giá thuê/tháng (VNĐ)", key: "price", width: 18 },
@@ -42,7 +43,7 @@ export async function buildOwnersWorkbook(
   const ids = owners.map((o) => o.id);
   const { data: buildings } = await supabase
     .from("buildings")
-    .select("id, owner_id, district, ward, alley, house_number, guide_name, guide_phone")
+    .select("id, owner_id, district, ward, alley, house_number, guide_name, guide_phone, access_type")
     .in("owner_id", ids);
 
   const buildingIds = (buildings ?? []).map((b) => b.id);
@@ -84,6 +85,7 @@ export async function buildOwnersWorkbook(
           houseNumber: b.house_number ?? "",
           guideName: b.guide_name ?? "",
           guidePhone: b.guide_phone ?? "",
+          accessType: b.access_type ?? "",
           roomNumber: u.room_number,
           unitType: u.unit_type,
           price: formatPrice(u.price_month),

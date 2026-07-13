@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Search, X } from "lucide-react";
-import { DISTRICTS, UNIT_TYPES } from "@/lib/constants";
+import { DISTRICTS, UNIT_TYPES, ACCESS_TYPES } from "@/lib/constants";
 import { Button } from "@/components/ui";
 import { vndToTrieuStr, trieuStrToVnd } from "@/lib/format";
 
@@ -17,6 +17,7 @@ export function BuildingFilters() {
   const [priceMin, setPriceMin] = useState(vndToTrieuStr(searchParams.get("priceMin")));
   const [priceMax, setPriceMax] = useState(vndToTrieuStr(searchParams.get("priceMax")));
   const [unitTypes, setUnitTypes] = useState<string[]>(searchParams.getAll("unitType"));
+  const [accessType, setAccessType] = useState(searchParams.get("accessType") ?? "");
 
   function toggleUnitType(t: string) {
     setUnitTypes((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
@@ -24,6 +25,9 @@ export function BuildingFilters() {
 
   function apply() {
     const params = new URLSearchParams();
+    // Giữ chế độ xem theo tòa/phòng (admin) khi áp dụng bộ lọc.
+    const view = searchParams.get("view");
+    if (view) params.set("view", view);
     if (district) params.set("district", district);
     if (ownerCode) params.set("ownerCode", ownerCode);
     if (keyword) params.set("keyword", keyword);
@@ -32,6 +36,7 @@ export function BuildingFilters() {
     if (priceMinVnd) params.set("priceMin", String(priceMinVnd));
     if (priceMaxVnd) params.set("priceMax", String(priceMaxVnd));
     unitTypes.forEach((t) => params.append("unitType", t));
+    if (accessType) params.set("accessType", accessType);
     router.push(`/buildings?${params.toString()}`);
   }
 
@@ -42,11 +47,13 @@ export function BuildingFilters() {
     setPriceMin("");
     setPriceMax("");
     setUnitTypes([]);
-    router.push("/buildings");
+    setAccessType("");
+    const view = searchParams.get("view");
+    router.push(view ? `/buildings?view=${view}` : "/buildings");
   }
 
   const hasFilters =
-    district || ownerCode || keyword || priceMin || priceMax || unitTypes.length > 0;
+    district || ownerCode || keyword || priceMin || priceMax || unitTypes.length > 0 || accessType;
 
   return (
     <div className="mb-6 rounded-card border-[1.5px] border-line bg-white p-5">
@@ -133,6 +140,24 @@ export function BuildingFilters() {
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-[12.5px] font-semibold text-ink">Thang máy / Thang bộ</label>
+          <div className="relative">
+            <select
+              value={accessType}
+              onChange={(e) => setAccessType(e.target.value)}
+              className="w-full appearance-none rounded-field border-[1.5px] border-line bg-white px-3 py-2.5 text-sm text-ink outline-none focus:border-moss"
+            >
+              <option value="">Tất cả</option>
+              {ACCESS_TYPES.map((a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
