@@ -19,9 +19,9 @@ export function ContactValueCards() {
         <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-[9px] bg-brand-orange text-white">
           <Phone size={18} strokeWidth={2.2} />
         </div>
-        <h3 className="font-display text-base font-semibold text-ink">Hỗ trợ chi tiết</h3>
+        <h3 className="font-display text-base font-semibold text-ink">Luôn có người hỗ trợ</h3>
         <p className="mt-1 text-[13px] leading-relaxed text-muted-2">
-          Cần giúp đỡ khi dùng hệ thống? Xem thông tin liên hệ hỗ trợ.
+          Kết nối nhanh khi bạn cần hướng dẫn hoặc gặp vướng mắc trong quá trình sử dụng.
         </p>
       </button>
 
@@ -33,9 +33,9 @@ export function ContactValueCards() {
         <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-[9px] bg-brand-orange text-white">
           <UserPlus size={18} strokeWidth={2.2} />
         </div>
-        <h3 className="font-display text-base font-semibold text-ink">Đăng ký cộng tác viên</h3>
+        <h3 className="font-display text-base font-semibold text-ink">Mở rộng cơ hội cùng PH House</h3>
         <p className="mt-1 text-[13px] leading-relaxed text-muted-2">
-          Giới thiệu người quen tham gia đội ngũ cộng tác viên PH House.
+          Tham gia cộng đồng cộng tác viên và tiếp cận nguồn căn hộ được cập nhật liên tục.
         </p>
       </button>
 

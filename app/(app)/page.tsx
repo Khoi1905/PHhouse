@@ -10,16 +10,16 @@ type ValueProp = { icon: LucideIcon; title: string; description: string; href?: 
 
 const FIRST_VALUE_PROP: ValueProp = {
   icon: Zap,
-  title: "Tra cứu tức thì",
-  description: "Lọc theo quận/huyện, giá, loại phòng chỉ trong vài giây.",
+  title: "Tìm đúng phòng, thật nhanh",
+  description: "Thu hẹp nguồn phòng theo khu vực, loại phòng và ngân sách chỉ trong vài thao tác.",
   href: "/buildings?view=units",
 };
 
 // Chỉ admin thấy — gate bằng isAdmin && ở JSX bên dưới.
 const LAST_VALUE_PROP: ValueProp = {
   icon: History,
-  title: "Lưu vết mọi thay đổi",
-  description: "Giá và tình trạng phòng đều được ghi lại lịch sử, biết rõ ai sửa khi nào.",
+  title: "Mọi cập nhật đều rõ ràng",
+  description: "Theo dõi lịch sử giá và tình trạng phòng để luôn nắm đúng nguồn dữ liệu mới nhất.",
 };
 
 function ValuePropCard({ prop }: { prop: ValueProp }) {
@@ -59,11 +59,11 @@ export default async function HomePage() {
       <div className="mb-8 text-center sm:text-left">
         <Logo size="lg" className="mb-4 justify-center sm:justify-start" />
         <h1 className="font-display text-2xl font-bold text-ink sm:text-3xl">
-          Chào mừng trở lại, {profile.fullName ?? "bạn"}!
+          Chào {profile.fullName ?? "bạn"}, hôm nay bạn muốn tìm căn nào?
         </h1>
         <p className="mx-auto mt-2 max-w-xl text-sm text-muted-2 sm:mx-0 sm:text-[15px]">
-          Toàn bộ tòa nhà, phòng và chủ sở hữu ở một nơi — tra cứu tức thì, cập nhật theo thời gian
-          thực, đúng những gì vai trò của bạn được xem.
+          Tra cứu nguồn phòng nhanh, xem đúng thông tin theo vai trò và tiếp tục công việc từ một
+          nơi duy nhất.
         </p>
       </div>
 

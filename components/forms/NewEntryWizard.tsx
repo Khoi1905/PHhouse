@@ -95,7 +95,7 @@ export function NewEntryWizard() {
         <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-orange">
           PH HOUSE · Nhập liệu căn hộ
         </p>
-        <h1 className="font-display text-2xl font-bold text-ink sm:text-3xl">Thêm mới vào hệ thống</h1>
+        <h1 className="font-display text-2xl font-bold text-ink sm:text-3xl">Thêm nguồn căn hộ mới</h1>
         <p className="mt-2 max-w-md text-[13.5px] leading-relaxed text-muted-2">
           Dữ liệu được lưu theo 3 lớp lồng nhau — Chủ sở hữu chứa Tòa nhà, Tòa nhà chứa Phòng. Tòa
           nhà không cần mã riêng, được định danh trực tiếp bằng địa chỉ.
