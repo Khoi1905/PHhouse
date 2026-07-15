@@ -6,6 +6,7 @@ export function Field({
   hint,
   locked,
   required,
+  error,
   children,
   className,
 }: {
@@ -13,6 +14,7 @@ export function Field({
   hint?: string;
   locked?: boolean;
   required?: boolean;
+  error?: string;
   children: ReactNode;
   className?: string;
 }) {
@@ -31,6 +33,11 @@ export function Field({
         )}
       </label>
       {children}
+      {error && (
+        <p role="alert" className="m-0 font-sans text-xs text-danger-fg">
+          {error}
+        </p>
+      )}
       {hint && <p className="m-0 font-sans text-xs text-muted">{hint}</p>}
     </div>
   );

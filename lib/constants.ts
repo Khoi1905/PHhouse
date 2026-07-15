@@ -23,7 +23,10 @@ export const STATUS_STYLES: Record<(typeof UNIT_STATUSES)[number], { bg: string;
   "Cuối tháng trống": { bg: "#EFE7F5", fg: "#6B4C96" },
 };
 
+export const USER_ROLES = ["admin", "sale"] as const;
+
 export type District = (typeof DISTRICTS)[number];
 export type UnitType = (typeof UNIT_TYPES)[number];
 export type UnitStatus = (typeof UNIT_STATUSES)[number];
 export type AccessType = (typeof ACCESS_TYPES)[number];
+export type UserRole = (typeof USER_ROLES)[number];

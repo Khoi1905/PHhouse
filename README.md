@@ -6,7 +6,7 @@ Next.js 14 (App Router) + TypeScript + Supabase (Postgres/Auth/RLS) + Tailwind C
 
 1. Cài dependency: `npm install`
 2. Làm theo [`supabase/README.md`](./supabase/README.md) để tạo project Supabase, chạy `supabase/schema.sql`, và tạo tài khoản admin đầu tiên.
-3. Copy `.env.local.example` thành `.env.local`, điền `NEXT_PUBLIC_SUPABASE_URL` và `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+3. Copy `.env.local.example` thành `.env.local`, điền `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` và `SUPABASE_SERVICE_ROLE_KEY`.
 4. `npm run dev` → http://localhost:3000
 
 ## Cấu trúc chính
@@ -24,4 +24,4 @@ Next.js 14 (App Router) + TypeScript + Supabase (Postgres/Auth/RLS) + Tailwind C
 
 ## Deploy
 
-Deploy trên Vercel như bình thường cho Next.js App Router; nhớ khai báo 2 biến môi trường ở trên trong Vercel Project Settings.
+Deploy trên Vercel như bình thường cho Next.js App Router; nhớ khai báo đủ 3 biến môi trường ở trên trong Vercel Project Settings. `SUPABASE_SERVICE_ROLE_KEY` là secret server-only, tuyệt đối không thêm prefix `NEXT_PUBLIC_`.

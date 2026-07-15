@@ -38,24 +38,35 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && isLoginPage) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    return NextResponse.redirect(url);
-  }
-
   const isAdminOnlyRoute = ADMIN_ONLY_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );
 
-  if (user && isAdminOnlyRoute) {
+  if (user) {
+    // is_active là nguồn chân lý duy nhất cho trạng thái khóa. Đọc profile một
+    // lần ở middleware để tài khoản đã bị khóa không render app shell và cũng
+    // không rơi vào vòng lặp /login <-> /.
     const { data: profile } = await supabase
       .from("user_profiles")
-      .select("role")
+      .select("role, is_active")
       .eq("id", user.id)
       .single();
 
-    if (profile?.role !== "admin") {
+    if (!profile?.is_active) {
+      if (isLoginPage) return supabaseResponse;
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+
+    if (isLoginPage) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      return NextResponse.redirect(url);
+    }
+
+    if (isAdminOnlyRoute && profile.role !== "admin") {
       const url = request.nextUrl.clone();
       url.pathname = "/buildings";
       return NextResponse.redirect(url);

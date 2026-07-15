@@ -12,10 +12,21 @@ export async function signIn(_prevState: { error: string | null }, formData: For
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) {
+  if (error || !data.user) {
     return { error: "Email hoặc mật khẩu không đúng." };
+  }
+
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("is_active")
+    .eq("id", data.user.id)
+    .single();
+
+  if (!profile?.is_active) {
+    await supabase.auth.signOut();
+    return { error: "Tài khoản đã bị khóa hoặc chưa được cấp quyền." };
   }
 
   redirect("/");

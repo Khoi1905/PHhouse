@@ -4,11 +4,23 @@ import {
   UNIT_TYPES,
   UNIT_STATUSES,
   ACCESS_TYPES,
+  USER_ROLES,
   type District,
   type UnitType,
   type UnitStatus,
   type AccessType,
 } from "./constants";
+
+// 6 ký tự — khớp mức tối thiểu mặc định của Supabase Auth. Nếu project Supabase
+// đã siết mật khẩu chặt hơn, lỗi thật từ auth.admin.createUser() sẽ hiện ra
+// (validate ở đây chỉ chặn sớm case rõ ràng ngắn, không thay thế policy thật).
+export const createUserSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Email không hợp lệ"),
+  password: z.string().min(6, "Mật khẩu tối thiểu 6 ký tự"),
+  fullName: z.string().trim().min(1, "Bắt buộc"),
+  role: z.enum(USER_ROLES, { error: "Vui lòng chọn vai trò" }),
+});
+export type CreateUserValues = z.infer<typeof createUserSchema>;
 
 // % hoa hồng nhập dạng chuỗi (giống các field optional khác), chỉ validate là
 // số 0-100 khi có giá trị — để trống thì bỏ qua, convert sang number | null

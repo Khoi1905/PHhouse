@@ -24,6 +24,7 @@ export const getCurrentProfile = cache(async (): Promise<CurrentProfile | null> 
     .from("user_profiles")
     .select("id, role, full_name")
     .eq("id", user.id)
+    .eq("is_active", true)
     .single();
 
   if (!profile) return null;

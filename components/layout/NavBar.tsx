@@ -26,6 +26,9 @@ export function NavBar({ profile }: { profile: CurrentProfile }) {
           <Link href="/admin/overview" className="hover:text-brand-orange" onClick={() => setOpen(false)}>
             Bảng tổng hợp
           </Link>
+          <Link href="/admin/users" className="hover:text-brand-orange" onClick={() => setOpen(false)}>
+            Tài khoản
+          </Link>
           <Link
             href="/admin/new-entry"
             className="text-brand-orange hover:text-brand-orange-dark"
@@ -65,12 +68,12 @@ export function NavBar({ profile }: { profile: CurrentProfile }) {
           <Link href="/">
             <Logo size="sm" />
           </Link>
-          <nav className="hidden items-center gap-5 text-sm font-semibold text-muted-2 md:flex">
+          <nav className="hidden items-center gap-5 text-sm font-semibold text-muted-2 lg:flex">
             {navLinks}
           </nav>
         </div>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-4 lg:flex">
           {userInfo}
           {logoutButton}
         </div>
@@ -78,7 +81,7 @@ export function NavBar({ profile }: { profile: CurrentProfile }) {
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="flex h-9 w-9 items-center justify-center rounded-field border border-line text-ink md:hidden"
+          className="flex h-9 w-9 items-center justify-center rounded-field border border-line text-ink lg:hidden"
           aria-label={open ? "Đóng menu" : "Mở menu"}
         >
           {open ? <X size={18} /> : <Menu size={18} />}
@@ -86,7 +89,7 @@ export function NavBar({ profile }: { profile: CurrentProfile }) {
       </div>
 
       {open && (
-        <div className="border-t border-line px-4 py-4 md:hidden">
+        <div className="border-t border-line px-4 py-4 lg:hidden">
           <nav className="flex flex-col gap-4 text-sm font-semibold text-muted-2">{navLinks}</nav>
           <div className="mt-4 flex items-center justify-between border-t border-line pt-4">
             {userInfo}

@@ -699,5 +699,7 @@
   --    insert into user_profiles (id, role, full_name)
   --    values ('00000000-0000-0000-0000-000000000000', 'admin', 'Tên admin');
   --
-  -- Tạo tài khoản sale sau này lặp lại đúng 2 bước trên với role = 'sale'.
+  -- Sau khi đăng nhập bằng admin đầu tiên, tạo/khóa/mở khóa các tài khoản tiếp
+  -- theo tại /admin/users. Tính năng này cần SUPABASE_SERVICE_ROLE_KEY ở server;
+  -- tuyệt đối không thêm prefix NEXT_PUBLIC_ hoặc đưa secret xuống client.
   -- ============================================================================
