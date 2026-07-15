@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "./server";
 
 export type CurrentProfile = {
@@ -6,8 +7,13 @@ export type CurrentProfile = {
   fullName: string | null;
 };
 
-/** Server-side helper: current logged-in user's app role + name, or null if not logged in. */
-export async function getCurrentProfile(): Promise<CurrentProfile | null> {
+/**
+ * Server-side helper: current logged-in user's app role + name, or null if not logged in.
+ * Wrapped in React.cache() vì layout.tsx VÀ mỗi page.tsx đều tự gọi hàm này —
+ * cache() dedupe theo request, nên trong 1 lần render chỉ thực sự chạy
+ * auth.getUser() + query user_profiles MỘT LẦN thay vì 2 lần round-trip Supabase.
+ */
+export const getCurrentProfile = cache(async (): Promise<CurrentProfile | null> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -23,4 +29,4 @@ export async function getCurrentProfile(): Promise<CurrentProfile | null> {
   if (!profile) return null;
 
   return { id: profile.id, role: profile.role, fullName: profile.full_name };
-}
+});
