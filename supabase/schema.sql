@@ -123,6 +123,12 @@
     is_active boolean default true
   );
 
+  -- Safety net for DBs where `user_profiles` already existed before is_active
+  -- was introduced — same reasoning as buildings/units above. Without this,
+  -- auth_role() (used in every RLS policy) fails with "column does not exist"
+  -- on any DB where user_profiles predates this column.
+  alter table user_profiles add column if not exists is_active boolean default true;
+
   create index if not exists idx_buildings_owner_id on buildings(owner_id);
   create index if not exists idx_buildings_district on buildings(district);
   create index if not exists idx_units_building_id on units(building_id);
