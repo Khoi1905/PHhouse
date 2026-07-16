@@ -431,6 +431,11 @@
   --    set_building_pin) sort first, most-recently-pinned on top, WITHIN the
   --    already-filtered result set only.
   --
+  --    Within each of those two tiers (pinned / not pinned), when p_unit_types
+  --    has values, rooms matching MORE of the selected types float higher —
+  --    e.g. filtering Studio+1N1K, a room tagged both sorts above a room
+  --    tagged only one. No-op when p_unit_types is null (no type filter).
+  --
   --    Signature grows occasionally (e.g. access_type below) — drop every
   --    existing overload first, same trap as create_full_entry.
   -- ----------------------------------------------------------------------------
@@ -521,7 +526,14 @@
       and (p_statuses is null or u.status = any(p_statuses))
       -- Sale never sees full rooms, enforced regardless of the params above.
       and (v_role = 'admin' or u.status <> 'Full')
-    order by (u.pinned_at is null), u.pinned_at desc, b.district, b.alley nulls last, u.room_number;
+    order by
+      (u.pinned_at is null),
+      u.pinned_at desc,
+      case
+        when p_unit_types is null then 0
+        else (select count(*) from unnest(u.unit_type) t(x) where x = any(p_unit_types))
+      end desc,
+      b.district, b.alley nulls last, u.room_number;
   end;
   $$;
 
