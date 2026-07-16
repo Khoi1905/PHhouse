@@ -3,18 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import { Select, Button, MultiSelectDropdown } from "@/components/ui";
+import { Button, MultiSelectDropdown } from "@/components/ui";
 import { DISTRICTS, UNIT_TYPES } from "@/lib/constants";
 
 export function HomeSearchBar() {
   const router = useRouter();
   const [districts, setDistricts] = useState<string[]>([]);
-  const [unitType, setUnitType] = useState("");
+  const [unitTypes, setUnitTypes] = useState<string[]>([]);
 
   function handleSearch() {
     const params = new URLSearchParams();
     districts.forEach((d) => params.append("district", d));
-    if (unitType) params.set("unitType", unitType);
+    unitTypes.forEach((t) => params.append("unitType", t));
     const query = params.toString();
     router.push(query ? `/buildings?${query}` : "/buildings");
   }
@@ -27,7 +27,7 @@ export function HomeSearchBar() {
       </div>
       <div className="flex-1">
         <label className="mb-1.5 block text-[12.5px] font-semibold text-ink">Loại phòng</label>
-        <Select options={UNIT_TYPES} value={unitType} onChange={(e) => setUnitType(e.target.value)} />
+        <MultiSelectDropdown options={UNIT_TYPES} selected={unitTypes} onChange={setUnitTypes} />
       </div>
       <Button type="button" variant="primary" onClick={handleSearch} className="sm:flex-shrink-0">
         <Search size={16} /> Tìm phòng ngay
