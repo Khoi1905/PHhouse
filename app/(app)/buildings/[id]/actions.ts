@@ -40,7 +40,7 @@ export async function updateUnitFull(
     .from("units")
     .update({
       room_number: v.roomNumber,
-      unit_type: v.unitType,
+      unit_type: v.unitTypes,
       price_month: v.priceMonth,
       status: v.status,
       details_text: v.detailsText || null,

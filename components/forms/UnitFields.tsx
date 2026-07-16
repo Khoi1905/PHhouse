@@ -2,7 +2,7 @@
 
 import { useFormContext, Controller } from "react-hook-form";
 import { Link as LinkIcon } from "lucide-react";
-import { Field, TextInput, Select, Textarea, StatusPicker } from "@/components/ui";
+import { Field, TextInput, Textarea, StatusPicker, MultiSelectDropdown } from "@/components/ui";
 import { UNIT_TYPES } from "@/lib/constants";
 import { vndToTrieuStr, trieuStrToVnd } from "@/lib/format";
 import type { WizardFormValues } from "@/lib/validation";
@@ -21,7 +21,17 @@ export function UnitFields() {
           <TextInput placeholder="203" {...register("roomNumber")} />
         </Field>
         <Field label="Loại phòng" required>
-          <Select options={UNIT_TYPES} {...register("unitType")} />
+          <Controller
+            control={control}
+            name="unitTypes"
+            render={({ field }) => (
+              <MultiSelectDropdown
+                options={UNIT_TYPES}
+                selected={field.value ?? []}
+                onChange={field.onChange}
+              />
+            )}
+          />
         </Field>
 
         <Field label="Giá thuê / tháng (triệu đồng)" required hint="Dùng để sale lọc theo khoảng giá">
@@ -50,6 +60,7 @@ export function UnitFields() {
       </div>
 
       {errors.roomNumber && <p className="-mt-3 mb-3 text-xs text-[#9C4A4A]">{errors.roomNumber.message as string}</p>}
+      {errors.unitTypes && <p className="-mt-3 mb-3 text-xs text-[#9C4A4A]">{errors.unitTypes.message as string}</p>}
       {errors.priceMonth && <p className="-mt-3 mb-3 text-xs text-[#9C4A4A]">{errors.priceMonth.message as string}</p>}
 
       <Field

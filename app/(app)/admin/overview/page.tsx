@@ -5,7 +5,7 @@ import type { UnitStatus } from "@/lib/constants";
 type RawUnit = {
   id: string;
   room_number: string;
-  unit_type: string;
+  unit_type: string[];
   price_month: number;
   status: UnitStatus;
   details_text: string | null;
@@ -64,7 +64,7 @@ export default async function AdminOverviewPage() {
         accessType: b.access_type,
         unitId: u.id,
         roomNumber: u.room_number,
-        unitType: u.unit_type,
+        unitType: u.unit_type.join(", "),
         priceMonth: u.price_month,
         status: u.status,
         detailsText: u.details_text,

@@ -87,7 +87,7 @@ export async function buildOwnersWorkbook(
           guidePhone: b.guide_phone ?? "",
           accessType: b.access_type ?? "",
           roomNumber: u.room_number,
-          unitType: u.unit_type,
+          unitType: u.unit_type.join(", "),
           price: formatPrice(u.price_month),
           status: u.status,
           details: u.details_text ?? "",

@@ -76,7 +76,7 @@ export type Database = {
           id: string;
           building_id: string;
           room_number: string;
-          unit_type: UnitType;
+          unit_type: UnitType[];
           price_month: number;
           status: UnitStatus;
           details_text: string | null;
@@ -90,7 +90,7 @@ export type Database = {
           id?: string;
           building_id: string;
           room_number: string;
-          unit_type: UnitType;
+          unit_type: UnitType[];
           price_month: number;
           status?: UnitStatus;
           details_text?: string | null;
@@ -205,7 +205,7 @@ export type Database = {
           pinned_at: string | null;
           owner_code: string;
           room_number: string;
-          unit_type: string;
+          unit_type: string[];
           price_month: number;
           status: UnitStatus;
           details_text: string | null;
@@ -246,7 +246,7 @@ export type Database = {
           p_access_type: string | null;
           p_building_note: string | null;
           p_room_number: string;
-          p_unit_type: string;
+          p_unit_types: string[];
           p_price_month: number;
           p_status: string;
           p_details_text: string | null;

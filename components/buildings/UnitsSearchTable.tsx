@@ -17,7 +17,7 @@ export type UnitSearchRow = {
   pinned_at: string | null;
   owner_code: string;
   room_number: string;
-  unit_type: string;
+  unit_type: string[];
   price_month: number;
   status: UnitStatus;
   details_text: string | null;
@@ -98,7 +98,7 @@ export function UnitsSearchTable({ rows, isAdmin }: { rows: UnitSearchRow[]; isA
                   <td className="px-4 py-3 text-ink">{u.district}</td>
                   <td className="px-4 py-3 text-muted-2">{u.alley || "—"}</td>
                   <td className="px-4 py-3 font-semibold text-ink">{u.room_number}</td>
-                  <td className="px-4 py-3 text-ink">{u.unit_type}</td>
+                  <td className="px-4 py-3 text-ink">{u.unit_type.join(", ")}</td>
                   <td className="px-4 py-3 text-ink">{formatPrice(u.price_month)} đ</td>
                   <td className="px-4 py-3">
                     <StatusPill status={u.status} />
@@ -117,7 +117,7 @@ export function UnitsSearchTable({ rows, isAdmin }: { rows: UnitSearchRow[]; isA
         title={slideOverUnit ? `Phòng ${slideOverUnit.room_number}` : ""}
         subtitle={
           slideOverUnit
-            ? `${slideOverUnit.unit_type} · ${formatPrice(slideOverUnit.price_month)} đ/tháng`
+            ? `${slideOverUnit.unit_type.join(", ")} · ${formatPrice(slideOverUnit.price_month)} đ/tháng`
             : undefined
         }
       >

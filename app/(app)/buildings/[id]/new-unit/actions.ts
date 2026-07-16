@@ -16,7 +16,7 @@ export async function createUnit(buildingId: string, values: WizardFormValues): 
   const { error } = await supabase.from("units").insert({
     building_id: buildingId,
     room_number: v.roomNumber,
-    unit_type: v.unitType,
+    unit_type: v.unitTypes,
     price_month: v.priceMonth,
     status: v.status,
     details_text: v.detailsText || null,

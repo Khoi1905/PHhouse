@@ -19,7 +19,7 @@ import { pinUnitAction } from "@/app/(app)/buildings/actions";
 export type UnitRow = {
   id: string;
   room_number: string;
-  unit_type: string;
+  unit_type: string[];
   price_month: number;
   status: UnitStatus;
   details_text: string | null;
@@ -135,7 +135,7 @@ export function UnitsTable({
                   className="cursor-pointer border-b border-line last:border-0 hover:bg-paper"
                 >
                   <td className="px-4 py-3 font-semibold text-ink">{u.room_number}</td>
-                  <td className="px-4 py-3 text-ink">{u.unit_type}</td>
+                  <td className="px-4 py-3 text-ink">{u.unit_type.join(", ")}</td>
                   <td className="px-4 py-3 text-ink" onClick={(e) => editing && e.stopPropagation()}>
                     {editing ? (
                       <input
@@ -269,7 +269,11 @@ export function UnitsTable({
         open={!!slideOverUnit}
         onClose={() => setSlideOverUnit(null)}
         title={slideOverUnit ? `Phòng ${slideOverUnit.room_number}` : ""}
-        subtitle={slideOverUnit ? `${slideOverUnit.unit_type} · ${formatPrice(slideOverUnit.price_month)} đ/tháng` : undefined}
+        subtitle={
+          slideOverUnit
+            ? `${slideOverUnit.unit_type.join(", ")} · ${formatPrice(slideOverUnit.price_month)} đ/tháng`
+            : undefined
+        }
       >
         {slideOverUnit && (
           <div className="space-y-4">
@@ -350,7 +354,7 @@ function FullEditUnitForm({
     defaultValues: {
       mode: "new",
       roomNumber: unit.room_number,
-      unitType: unit.unit_type as WizardFormValues["unitType"],
+      unitTypes: unit.unit_type as WizardFormValues["unitTypes"],
       priceMonth: unit.price_month,
       status: unit.status,
       detailsText: unit.details_text ?? "",

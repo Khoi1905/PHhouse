@@ -89,7 +89,11 @@
     id uuid primary key default gen_random_uuid(),
     building_id uuid references buildings(id) on delete cascade not null,
     room_number text not null,
-    unit_type text not null check (unit_type in ('Studio','1N1K','2N1K','Gác xép','Giường tầng','Đơn-VSC')),
+    -- Mảng — 1 phòng có thể gán nhiều loại phòng cùng lúc.
+    unit_type text[] not null check (
+      unit_type <@ array['Studio','1N1K','2N1K','Gác xép','Giường tầng','Đơn-VSC']::text[]
+      and array_length(unit_type, 1) > 0
+    ),
     price_month numeric not null,
     status text not null default 'Trống' check (status in ('Trống','Full','Giữa tháng trống','Cuối tháng trống')),
     details_text text,
@@ -101,6 +105,31 @@
     created_at timestamptz default now(),
     updated_at timestamptz default now()
   );
+
+  -- Safety net (2026-07-16): DBs where units.unit_type already exists as a
+  -- scalar text column need a one-time migration to text[] — each existing
+  -- room keeps its single type, now as a 1-element array. Guarded by the
+  -- data_type check so this is a no-op on fresh DBs or DBs already migrated.
+  do $$
+  begin
+    if exists (
+      select 1 from information_schema.columns
+      where table_schema = 'public' and table_name = 'units'
+        and column_name = 'unit_type' and data_type <> 'ARRAY'
+    ) then
+      alter table units drop constraint if exists units_unit_type_check;
+      alter table units alter column unit_type type text[] using array[unit_type];
+    end if;
+  end $$;
+
+  -- Keep the allowed-values constraint in sync every run (idempotent
+  -- drop+recreate, same pattern as elsewhere in this file).
+  alter table units drop constraint if exists units_unit_type_check;
+  alter table units add constraint units_unit_type_check
+    check (
+      unit_type <@ array['Studio','1N1K','2N1K','Gác xép','Giường tầng','Đơn-VSC']::text[]
+      and array_length(unit_type, 1) > 0
+    );
 
   -- Safety net for DBs where `units` already existed before pinned_at was
   -- introduced — same reasoning as buildings above.
@@ -133,7 +162,11 @@
   create index if not exists idx_buildings_district on buildings(district);
   create index if not exists idx_units_building_id on units(building_id);
   create index if not exists idx_units_status on units(status);
-  create index if not exists idx_units_unit_type on units(unit_type);
+  -- GIN, không phải btree — unit_type giờ là mảng, cần cho toán tử && (overlap)
+  -- ở search_buildings/search_units. Drop trước để an toàn nếu index cũ (btree,
+  -- từ khi unit_type còn là scalar) đã tồn tại với cùng tên.
+  drop index if exists idx_units_unit_type;
+  create index if not exists idx_units_unit_type on units using gin(unit_type);
   create index if not exists idx_unit_history_unit_id on unit_history(unit_id);
   -- Không thêm index cho pinned_at: search_buildings sort trên kết quả SAU
   -- group by (index bảng gốc không giúp được), search_units sort nhiều khóa
@@ -371,7 +404,7 @@
           where u2.building_id = b.id
             and (p_price_min is null or u2.price_month >= p_price_min)
             and (p_price_max is null or u2.price_month <= p_price_max)
-            and (p_unit_types is null or u2.unit_type = any(p_unit_types))
+            and (p_unit_types is null or u2.unit_type && p_unit_types)
         )
       )
     group by b.id, o.owner_code
@@ -434,7 +467,7 @@
     pinned_at timestamptz,
     owner_code text,
     room_number text,
-    unit_type text,
+    unit_type text[],
     price_month numeric,
     status text,
     details_text text,
@@ -484,7 +517,7 @@
       )
       and (p_price_min is null or u.price_month >= p_price_min)
       and (p_price_max is null or u.price_month <= p_price_max)
-      and (p_unit_types is null or u.unit_type = any(p_unit_types))
+      and (p_unit_types is null or u.unit_type && p_unit_types)
       and (p_statuses is null or u.status = any(p_statuses))
       -- Sale never sees full rooms, enforced regardless of the params above.
       and (v_role = 'admin' or u.status <> 'Full')
@@ -578,7 +611,7 @@
     p_access_type text,
     p_building_note text,
     p_room_number text,
-    p_unit_type text,
+    p_unit_types text[],
     p_price_month numeric,
     p_status text,
     p_details_text text,
@@ -615,7 +648,7 @@
     returning id into v_building_id;
 
     insert into units (building_id, room_number, unit_type, price_month, status, details_text, gdrive_folder_link, note)
-    values (v_building_id, p_room_number, p_unit_type, p_price_month, p_status,
+    values (v_building_id, p_room_number, p_unit_types, p_price_month, p_status,
             nullif(p_details_text, ''), nullif(p_gdrive_link, ''), nullif(p_unit_note, ''))
     returning id into v_unit_id;
 
@@ -670,15 +703,14 @@
   -- section 1 (ngay sau CREATE TABLE owners) — bắt buộc phải chạy SỚM vì
   -- buildings_sale_view bên dưới tham chiếu o.commission_sale_pct ngay khi tạo.
 
-  -- ============================================================================
-  -- Migration (2026-07-12): thêm loại phòng "Đơn-VSC".
-  -- Nếu project Supabase của bạn đã chạy schema.sql từ trước, chạy khối này
-  -- 1 lần trong SQL Editor để đồng bộ. Chỉ THÊM giá trị mới nên không cần remap
-  -- dữ liệu cũ (khác migration đổi status trước đây).
-  -- ============================================================================
-  alter table units drop constraint if exists units_unit_type_check;
-  alter table units add constraint units_unit_type_check
-    check (unit_type in ('Studio','1N1K','2N1K','Gác xép','Giường tầng','Đơn-VSC'));
+  -- Migration (2026-07-12) thêm loại phòng "Đơn-VSC" đã được gộp lên section 1
+  -- (ràng buộc unit_type ngay sau CREATE TABLE units) — cùng lý do idempotent-
+  -- early-alter như các migration khác.
+
+  -- Migration (2026-07-16) đổi unit_type từ scalar text sang text[] (1 phòng
+  -- gán được nhiều loại) đã được gộp lên section 1, ngay sau CREATE TABLE units
+  -- — bắt buộc chạy sớm vì search_buildings/search_units/create_full_entry bên
+  -- dưới đều tham chiếu kiểu mảng này ngay khi được (re)tạo.
 
   -- ============================================================================
   -- Migration (2026-07-12): thêm "Người dẫn" / "Số dẫn" cho tòa nhà (nhạy cảm

@@ -51,7 +51,7 @@ export async function createFullEntry(values: FullEntryFormValues): Promise<Crea
     p_access_type: v.accessType || null,
     p_building_note: v.buildingNote ?? null,
     p_room_number: v.roomNumber,
-    p_unit_type: v.unitType,
+    p_unit_types: v.unitTypes,
     p_price_month: v.priceMonth,
     p_status: v.status,
     p_details_text: v.detailsText ?? null,

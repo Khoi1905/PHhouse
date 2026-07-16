@@ -83,7 +83,7 @@ export type BuildingStepValues = z.infer<typeof buildingStepSchema>;
 
 export const unitStepSchema = z.object({
   roomNumber: z.string().min(1, "Bắt buộc"),
-  unitType: z.enum(UNIT_TYPES, { error: "Vui lòng chọn loại phòng" }),
+  unitTypes: z.array(z.enum(UNIT_TYPES)).min(1, "Vui lòng chọn ít nhất 1 loại phòng"),
   priceMonth: z.coerce.number({ error: "Giá không hợp lệ" }).positive("Giá phải lớn hơn 0"),
   status: z.enum(UNIT_STATUSES),
   detailsText: z.string().optional(),
@@ -126,7 +126,7 @@ export type WizardFormValues = {
   accessType?: AccessType | "";
   buildingNote?: string;
   roomNumber?: string;
-  unitType?: UnitType;
+  unitTypes?: UnitType[];
   priceMonth?: number;
   status: UnitStatus;
   detailsText?: string;
