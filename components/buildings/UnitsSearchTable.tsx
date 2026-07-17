@@ -6,6 +6,7 @@ import { ExternalLink, Star } from "lucide-react";
 import { SlideOver, StatusPill } from "@/components/ui";
 import { formatPrice } from "@/lib/format";
 import { pinUnitAction } from "@/app/(app)/buildings/actions";
+import { useUrlParamState } from "@/lib/hooks/useUrlParamState";
 import type { UnitStatus } from "@/lib/constants";
 
 export type UnitSearchRow = {
@@ -27,7 +28,8 @@ export type UnitSearchRow = {
 
 export function UnitsSearchTable({ rows, isAdmin }: { rows: UnitSearchRow[]; isAdmin: boolean }) {
   const router = useRouter();
-  const [slideOverUnit, setSlideOverUnit] = useState<UnitSearchRow | null>(null);
+  const { value: openUnitId, open: openUnit, close: closeUnit } = useUrlParamState("unit");
+  const slideOverUnit = rows.find((r) => r.id === openUnitId) ?? null;
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -75,7 +77,7 @@ export function UnitsSearchTable({ rows, isAdmin }: { rows: UnitSearchRow[]; isA
               return (
                 <tr
                   key={u.id}
-                  onClick={() => setSlideOverUnit(u)}
+                  onClick={() => openUnit(u.id)}
                   className="cursor-pointer border-b border-line last:border-0 hover:bg-paper"
                 >
                   <td className="px-4 py-3">
@@ -113,7 +115,7 @@ export function UnitsSearchTable({ rows, isAdmin }: { rows: UnitSearchRow[]; isA
 
       <SlideOver
         open={!!slideOverUnit}
-        onClose={() => setSlideOverUnit(null)}
+        onClose={closeUnit}
         title={slideOverUnit ? `Phòng ${slideOverUnit.room_number}` : ""}
         subtitle={
           slideOverUnit

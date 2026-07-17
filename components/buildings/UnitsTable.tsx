@@ -8,6 +8,7 @@ import { Button, ConfirmDialog, Modal, SlideOver, StatusPill } from "@/component
 import { UnitFields } from "@/components/forms/UnitFields";
 import { UNIT_STATUSES, type UnitStatus } from "@/lib/constants";
 import { formatPrice, vndToTrieuStr, trieuStrToVnd } from "@/lib/format";
+import { useUrlParamState } from "@/lib/hooks/useUrlParamState";
 import { unitStepSchema, type WizardFormValues } from "@/lib/validation";
 import {
   deleteUnitAction,
@@ -40,7 +41,8 @@ export function UnitsTable({
   const router = useRouter();
   const [quickEditId, setQuickEditId] = useState<string | null>(null);
   const [quickValues, setQuickValues] = useState({ priceMonth: 0, status: "Trống" as UnitStatus, gdriveFolderLink: "" });
-  const [slideOverUnit, setSlideOverUnit] = useState<UnitRow | null>(null);
+  const { value: openUnitId, open: openUnit, close: closeUnit } = useUrlParamState("unit");
+  const slideOverUnit = units.find((u) => u.id === openUnitId) ?? null;
   const [fullEditUnit, setFullEditUnit] = useState<UnitRow | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<UnitRow | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
@@ -131,7 +133,7 @@ export function UnitsTable({
               return (
                 <tr
                   key={u.id}
-                  onClick={() => !editing && setSlideOverUnit(u)}
+                  onClick={() => !editing && openUnit(u.id)}
                   className="cursor-pointer border-b border-line last:border-0 hover:bg-paper"
                 >
                   <td className="px-4 py-3 font-semibold text-ink">{u.room_number}</td>
@@ -267,7 +269,7 @@ export function UnitsTable({
 
       <SlideOver
         open={!!slideOverUnit}
-        onClose={() => setSlideOverUnit(null)}
+        onClose={closeUnit}
         title={slideOverUnit ? `Phòng ${slideOverUnit.room_number}` : ""}
         subtitle={
           slideOverUnit
