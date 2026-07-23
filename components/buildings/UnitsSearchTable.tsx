@@ -17,6 +17,7 @@ export type UnitSearchRow = {
   access_type: string | null;
   pinned_at: string | null;
   owner_code: string;
+  commission_sale_pct: number | null;
   room_number: string;
   unit_type: string[];
   price_month: number;
@@ -150,6 +151,10 @@ export function UnitsSearchTable({ rows, isAdmin }: { rows: UnitSearchRow[]; isA
                 <span className="font-semibold text-ink">{slideOverUnit.owner_code}</span>
               </span>
             </div>
+
+            {slideOverUnit.commission_sale_pct != null && (
+              <p className="text-sm text-muted-2">Hoa hồng cho sale: {slideOverUnit.commission_sale_pct}%</p>
+            )}
 
             <div>
               <p className="mb-1 text-[12.5px] font-semibold text-ink">Thông tin chi tiết</p>

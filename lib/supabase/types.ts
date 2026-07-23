@@ -204,6 +204,7 @@ export type Database = {
           access_type: AccessType | null;
           pinned_at: string | null;
           owner_code: string;
+          commission_sale_pct: number | null;
           room_number: string;
           unit_type: string[];
           price_month: number;
