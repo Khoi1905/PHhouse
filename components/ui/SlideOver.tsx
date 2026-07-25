@@ -7,12 +7,14 @@ export function SlideOver({
   open,
   title,
   subtitle,
+  headerExtra,
   onClose,
   children,
 }: {
   open: boolean;
   title: string;
   subtitle?: string;
+  headerExtra?: ReactNode;
   onClose: () => void;
   children: ReactNode;
 }) {
@@ -37,12 +39,15 @@ export function SlideOver({
             <h2 className="font-display text-xl font-semibold text-ink">{title}</h2>
             {subtitle && <p className="mt-1 text-[13px] text-muted">{subtitle}</p>}
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-full p-1.5 text-muted hover:bg-paper hover:text-ink"
-          >
-            <X size={18} />
-          </button>
+          <div className="flex items-start gap-3">
+            {headerExtra}
+            <button
+              onClick={onClose}
+              className="rounded-full p-1.5 text-muted hover:bg-paper hover:text-ink"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
         <div className="h-[calc(100%-73px)] overflow-y-auto px-6 py-5">{children}</div>
       </div>

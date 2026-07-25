@@ -22,6 +22,7 @@ export default async function BuildingsPage({
   const priceMax = typeof sp.priceMax === "string" ? Number(sp.priceMax) : undefined;
   const unitTypes = sp.unitType ? (Array.isArray(sp.unitType) ? sp.unitType : [sp.unitType]) : undefined;
   const accessType = typeof sp.accessType === "string" ? sp.accessType : undefined;
+  const sortBy = typeof sp.sort === "string" ? sp.sort : undefined;
   const page = typeof sp.page === "string" ? Math.max(1, Number(sp.page)) : 1;
 
   const profile = await getCurrentProfile();
@@ -37,6 +38,7 @@ export default async function BuildingsPage({
   if (mode === "units") {
     const { rows, count } = await searchUnits(supabase, {
       ...commonFilters,
+      sortBy,
       page,
       pageSize: PAGE_SIZE,
     });
@@ -52,7 +54,7 @@ export default async function BuildingsPage({
           {isAdmin && <ViewModeToggle mode={mode} />}
         </div>
 
-        <BuildingFilters />
+        <BuildingFilters mode={mode} />
         <UnitsSearchTable rows={rows} isAdmin={isAdmin} />
         <Pagination page={page} totalPages={totalPages} basePath="/buildings" />
       </div>
@@ -76,7 +78,7 @@ export default async function BuildingsPage({
         {isAdmin && <ViewModeToggle mode={mode} />}
       </div>
 
-      <BuildingFilters />
+      <BuildingFilters mode={mode} />
       <BuildingsTable rows={rows} isAdmin={isAdmin} />
       <Pagination page={page} totalPages={totalPages} basePath="/buildings" />
     </div>

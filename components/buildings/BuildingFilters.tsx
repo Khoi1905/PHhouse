@@ -3,11 +3,17 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Search, X } from "lucide-react";
-import { DISTRICTS, UNIT_TYPES, ACCESS_TYPES } from "@/lib/constants";
+import { DISTRICTS, UNIT_TYPES, ACCESS_TYPES, UNIT_SORT_OPTIONS } from "@/lib/constants";
 import { Button, MultiSelectDropdown } from "@/components/ui";
 import { vndToTrieuStr, trieuStrToVnd } from "@/lib/format";
 
-export function BuildingFilters() {
+export function BuildingFilters({
+  mode,
+  basePath = "/buildings",
+}: {
+  mode?: "buildings" | "units";
+  basePath?: string;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -18,6 +24,7 @@ export function BuildingFilters() {
   const [priceMax, setPriceMax] = useState(vndToTrieuStr(searchParams.get("priceMax")));
   const [unitTypes, setUnitTypes] = useState<string[]>(searchParams.getAll("unitType"));
   const [accessType, setAccessType] = useState(searchParams.get("accessType") ?? "");
+  const [sortBy, setSortBy] = useState(searchParams.get("sort") ?? "");
 
   function toggleUnitType(t: string) {
     setUnitTypes((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
@@ -37,7 +44,8 @@ export function BuildingFilters() {
     if (priceMaxVnd) params.set("priceMax", String(priceMaxVnd));
     unitTypes.forEach((t) => params.append("unitType", t));
     if (accessType) params.set("accessType", accessType);
-    router.push(`/buildings?${params.toString()}`);
+    if (mode === "units" && sortBy) params.set("sort", sortBy);
+    router.push(`${basePath}?${params.toString()}`);
   }
 
   function clearAll() {
@@ -48,12 +56,20 @@ export function BuildingFilters() {
     setPriceMax("");
     setUnitTypes([]);
     setAccessType("");
+    setSortBy("");
     const view = searchParams.get("view");
-    router.push(view ? `/buildings?view=${view}` : "/buildings");
+    router.push(view ? `${basePath}?view=${view}` : basePath);
   }
 
   const hasFilters =
-    districts.length > 0 || ownerCode || keyword || priceMin || priceMax || unitTypes.length > 0 || accessType;
+    districts.length > 0 ||
+    ownerCode ||
+    keyword ||
+    priceMin ||
+    priceMax ||
+    unitTypes.length > 0 ||
+    accessType ||
+    sortBy;
 
   return (
     <div className="mb-6 rounded-card border-[1.5px] border-line bg-white p-5">
@@ -147,6 +163,26 @@ export function BuildingFilters() {
             </select>
           </div>
         </div>
+
+        {mode === "units" && (
+          <div>
+            <label className="mb-1.5 block text-[12.5px] font-semibold text-ink">Sắp xếp</label>
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full appearance-none rounded-field border-[1.5px] border-line bg-white px-3 py-2.5 text-sm text-ink outline-none focus:border-moss"
+              >
+                <option value="">Mặc định</option>
+                {UNIT_SORT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="mt-4 flex items-center gap-2">

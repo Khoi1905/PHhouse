@@ -2,12 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Flame, Menu, X } from "lucide-react";
 import { signOut } from "@/app/login/actions";
 import type { CurrentProfile } from "@/lib/supabase/profile";
 import { Logo } from "./Logo";
 
-export function NavBar({ profile }: { profile: CurrentProfile }) {
+export function NavBar({
+  profile,
+  topUnitsLabel,
+}: {
+  profile: CurrentProfile;
+  topUnitsLabel: string;
+}) {
   const [open, setOpen] = useState(false);
 
   const navLinks = (
@@ -17,6 +23,14 @@ export function NavBar({ profile }: { profile: CurrentProfile }) {
       </Link>
       <Link href="/buildings" className="hover:text-brand-orange" onClick={() => setOpen(false)}>
         Tra cứu phòng
+      </Link>
+      <Link
+        href="/top"
+        className="flex items-center gap-1 text-brand-orange hover:text-brand-orange-dark"
+        onClick={() => setOpen(false)}
+      >
+        <Flame size={15} className="fill-brand-orange animate-pulse" />
+        {topUnitsLabel}
       </Link>
       {profile.role === "admin" && (
         <>

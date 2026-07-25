@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { Check, ExternalLink, History, Pencil, Plus, SquarePen, Star, Trash2, X } from "lucide-react";
+import { Check, ExternalLink, Flame, History, Pencil, Plus, SquarePen, Star, Trash2, X } from "lucide-react";
 import { Button, ConfirmDialog, Modal, SlideOver, StatusPill } from "@/components/ui";
 import { UnitFields } from "@/components/forms/UnitFields";
 import { UNIT_STATUSES, type UnitStatus } from "@/lib/constants";
@@ -15,7 +15,7 @@ import {
   updateUnitFull,
   updateUnitQuickFields,
 } from "@/app/(app)/buildings/[id]/actions";
-import { pinUnitAction } from "@/app/(app)/buildings/actions";
+import { pinUnitAction, toggleUnitTopAction } from "@/app/(app)/buildings/actions";
 
 export type UnitRow = {
   id: string;
@@ -27,6 +27,7 @@ export type UnitRow = {
   gdrive_folder_link: string | null;
   note: string | null;
   pinned_at: string | null;
+  top_added_at: string | null;
 };
 
 export function UnitsTable({
@@ -82,6 +83,17 @@ export function UnitsTable({
   function togglePin(unitId: string, currentlyPinned: boolean) {
     startTransition(async () => {
       const res = await pinUnitAction(unitId, !currentlyPinned, buildingId);
+      if (!res.ok) {
+        setRowError(res.error);
+        return;
+      }
+      router.refresh();
+    });
+  }
+
+  function toggleTop(unitId: string, currentlyTop: boolean) {
+    startTransition(async () => {
+      const res = await toggleUnitTopAction(unitId, !currentlyTop, buildingId);
       if (!res.ok) {
         setRowError(res.error);
         return;
@@ -226,6 +238,14 @@ export function UnitsTable({
                               title={u.pinned_at ? "Bỏ ghim phòng" : "Ghim phòng"}
                             >
                               <Star size={15} className={u.pinned_at ? "fill-brand-orange text-brand-orange" : ""} />
+                            </button>
+                            <button
+                              onClick={() => toggleTop(u.id, !!u.top_added_at)}
+                              disabled={pending}
+                              className="rounded-field p-1.5 text-muted-2 hover:bg-paper hover:text-ink disabled:opacity-50"
+                              title={u.top_added_at ? "Bỏ khỏi top" : "Thêm vào top"}
+                            >
+                              <Flame size={15} className={u.top_added_at ? "fill-brand-orange text-brand-orange" : ""} />
                             </button>
                             <button
                               onClick={() => startQuickEdit(u)}

@@ -31,7 +31,9 @@ export default async function OwnerDetailPage({ params }: { params: Promise<{ id
     (buildings ?? []).map(async (b) => {
       const { data: units } = await supabase
         .from("units")
-        .select("id, room_number, unit_type, price_month, status, details_text, gdrive_folder_link, note, pinned_at")
+        .select(
+          "id, room_number, unit_type, price_month, status, details_text, gdrive_folder_link, note, pinned_at, top_added_at"
+        )
         .eq("building_id", b.id)
         .order("room_number");
       return { building: b, units: units ?? [] };

@@ -83,6 +83,7 @@ export type Database = {
           gdrive_folder_link: string | null;
           note: string | null;
           pinned_at: string | null;
+          top_added_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -97,6 +98,7 @@ export type Database = {
           gdrive_folder_link?: string | null;
           note?: string | null;
           pinned_at?: string | null;
+          top_added_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -139,6 +141,18 @@ export type Database = {
           is_active?: boolean;
         };
         Update: Partial<Database["public"]["Tables"]["user_profiles"]["Insert"]>;
+        Relationships: [];
+      };
+      app_settings: {
+        Row: {
+          key: string;
+          value: string | null;
+        };
+        Insert: {
+          key: string;
+          value?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["app_settings"]["Insert"]>;
         Relationships: [];
       };
     };
@@ -195,6 +209,8 @@ export type Database = {
           p_unit_types?: string[] | null;
           p_statuses?: string[] | null;
           p_access_type?: string | null;
+          p_sort_by?: string | null;
+          p_top_only?: boolean | null;
         };
         Returns: {
           id: string;
@@ -203,6 +219,7 @@ export type Database = {
           alley: string | null;
           access_type: AccessType | null;
           pinned_at: string | null;
+          top_added_at: string | null;
           owner_code: string;
           commission_sale_pct: number | null;
           room_number: string;

@@ -39,3 +39,24 @@ export async function pinUnitAction(
   if (buildingId) revalidatePath(`/buildings/${buildingId}`);
   return { ok: true };
 }
+
+// Thêm/bỏ 1 phòng khỏi danh sách "Top phòng" — độc lập hoàn toàn với ghim,
+// không cascade theo tòa. Cùng cơ chế bảo mật như pinUnitAction (dựa RLS
+// admin_full_access_units, không cần check role tường minh ở đây).
+export async function toggleUnitTopAction(
+  unitId: string,
+  isTop: boolean,
+  buildingId?: string
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("units")
+    .update({ top_added_at: isTop ? new Date().toISOString() : null })
+    .eq("id", unitId);
+
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/buildings");
+  revalidatePath("/top");
+  if (buildingId) revalidatePath(`/buildings/${buildingId}`);
+  return { ok: true };
+}

@@ -25,8 +25,18 @@ export const STATUS_STYLES: Record<(typeof UNIT_STATUSES)[number], { bg: string;
 
 export const USER_ROLES = ["admin", "sale"] as const;
 
+// Sắp xếp cho view "theo phòng" (search_units) — không chọn thì giữ nguyên
+// thứ tự mặc định (khớp loại phòng nhiều hơn lên trước, rồi quận/ngõ/số phòng).
+export const UNIT_SORT_OPTIONS = [
+  { value: "price_asc", label: "Giá: Thấp → Cao" },
+  { value: "price_desc", label: "Giá: Cao → Thấp" },
+  { value: "commission_asc", label: "Hoa hồng: Thấp → Cao" },
+  { value: "commission_desc", label: "Hoa hồng: Cao → Thấp" },
+] as const;
+
 export type District = (typeof DISTRICTS)[number];
 export type UnitType = (typeof UNIT_TYPES)[number];
 export type UnitStatus = (typeof UNIT_STATUSES)[number];
 export type AccessType = (typeof ACCESS_TYPES)[number];
 export type UserRole = (typeof USER_ROLES)[number];
+export type UnitSortBy = (typeof UNIT_SORT_OPTIONS)[number]["value"];

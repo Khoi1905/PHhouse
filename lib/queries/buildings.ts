@@ -54,6 +54,8 @@ export type UnitSearchFilters = {
   unitTypes?: string[];
   statuses?: string[];
   accessType?: string;
+  sortBy?: string;
+  topOnly?: boolean;
   page?: number;
   pageSize?: number;
 };
@@ -81,6 +83,8 @@ export async function searchUnits(
         p_unit_types: filters.unitTypes && filters.unitTypes.length > 0 ? filters.unitTypes : null,
         p_statuses: filters.statuses && filters.statuses.length > 0 ? filters.statuses : null,
         p_access_type: filters.accessType || null,
+        p_sort_by: filters.sortBy || null,
+        p_top_only: filters.topOnly ?? false,
       },
       { count: "exact" }
     )
