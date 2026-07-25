@@ -461,21 +461,21 @@
     --    set only: (1) pinned AND in the top list, (2) pinned only, (3)
     --    everything else — including top-list-only units, which are NOT
     --    given any special ranking boost outside of tier 1 (top_added_at only
-    --    matters there, and for p_top_only's WHERE filter below). Within tiers
-    --    1-2, most-recently-pinned sorts first. p_top_only (used by the
-    --    dedicated /top page) only restricts the result set to top units — it
-    --    doesn't change this tier order, so pinned units still float within
-    --    that page too.
+    --    matters there, and for p_top_only's WHERE filter below). p_top_only
+    --    (used by the dedicated /top page) only restricts the result set to
+    --    top units — it doesn't change this tier order, so pinned units still
+    --    float within that page too.
     --
     --    Within each tier: if p_sort_by is set ('price_asc'/'price_desc'/
     --    'commission_asc'/'commission_desc'), rows sort by that field/
-    --    direction, district/alley/room_number as final tiebreak. This never
-    --    breaks the 3 tiers above — sort only reorders WITHIN a tier. If
-    --    p_sort_by is null (user didn't pick a sort), falls back to the
-    --    original default — when p_unit_types has values, rooms matching MORE
-    --    of the selected types float higher (e.g. filtering Studio+1N1K, a
-    --    room tagged both sorts above a room tagged only one), then district/
-    --    alley/room_number.
+    --    direction FIRST, then most-recently-pinned, then district/alley/
+    --    room_number as final tiebreak. This never breaks the 3 tiers above —
+    --    sort only reorders WITHIN a tier. If p_sort_by is null (user didn't
+    --    pick a sort), both sort CASEs yield NULL for every row (no-op) and
+    --    the original default takes over: most-recently-pinned first, then —
+    --    when p_unit_types has values — rooms matching MORE of the selected
+    --    types float higher (e.g. filtering Studio+1N1K, a room tagged both
+    --    sorts above a room tagged only one), then district/alley/room_number.
     --
     --    Signature grows occasionally (e.g. access_type below) — drop every
     --    existing overload first, same trap as create_full_entry.
@@ -580,7 +580,6 @@
           when u.pinned_at is not null then 1
           else 2
         end,
-        u.pinned_at desc,
         case p_sort_by
           when 'price_asc' then u.price_month
           when 'commission_asc' then o.commission_sale_pct
@@ -589,6 +588,12 @@
           when 'price_desc' then u.price_month
           when 'commission_desc' then o.commission_sale_pct
         end desc nulls last,
+        -- PHẢI đứng SAU 2 khối sort trên: pinned_at là timestamp gần như duy
+        -- nhất mỗi lần ghim, nếu để trước nó sẽ tạo thứ tự toàn phần và khóa
+        -- sort giá/hoa hồng không bao giờ được dùng tới trong nhóm đã ghim.
+        -- Khi p_sort_by null, 2 khối trên trả NULL cho mọi dòng (vô hiệu) nên
+        -- thứ tự mặc định "ghim gần đây nhất trước" vẫn giữ nguyên như cũ.
+        u.pinned_at desc,
         case
           when p_sort_by is not null then 0
           when p_unit_types is null then 0
