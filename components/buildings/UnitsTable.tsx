@@ -6,7 +6,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Check, ExternalLink, Flame, History, Pencil, Plus, SquarePen, Star, Trash2, X } from "lucide-react";
 import { Button, ConfirmDialog, Modal, SlideOver, StatusPill } from "@/components/ui";
 import { UnitFields } from "@/components/forms/UnitFields";
-import { UNIT_STATUSES, type UnitStatus } from "@/lib/constants";
+import { STATUS_STYLES, UNIT_STATUSES, type UnitStatus } from "@/lib/constants";
 import { formatPrice, vndToTrieuStr, trieuStrToVnd } from "@/lib/format";
 import { useUrlParamState } from "@/lib/hooks/useUrlParamState";
 import { unitStepSchema, type WizardFormValues } from "@/lib/validation";
@@ -41,7 +41,7 @@ export function UnitsTable({
 }) {
   const router = useRouter();
   const [quickEditId, setQuickEditId] = useState<string | null>(null);
-  const [quickValues, setQuickValues] = useState({ priceMonth: 0, status: "Trống" as UnitStatus, gdriveFolderLink: "" });
+  const [quickValues, setQuickValues] = useState({ priceMonth: 0, gdriveFolderLink: "" });
   const { value: openUnitId, open: openUnit, close: closeUnit } = useUrlParamState("unit");
   const slideOverUnit = units.find((u) => u.id === openUnitId) ?? null;
   const [fullEditUnit, setFullEditUnit] = useState<UnitRow | null>(null);
@@ -53,20 +53,38 @@ export function UnitsTable({
     setQuickEditId(u.id);
     setQuickValues({
       priceMonth: u.price_month,
-      status: u.status,
       gdriveFolderLink: u.gdrive_folder_link ?? "",
     });
     setRowError(null);
   }
 
-  function saveQuickEdit(unitId: string) {
+  function saveQuickEdit(u: UnitRow) {
     startTransition(async () => {
-      const res = await updateUnitQuickFields(unitId, buildingId, quickValues);
+      const res = await updateUnitQuickFields(u.id, buildingId, {
+        priceMonth: quickValues.priceMonth,
+        status: u.status,
+        gdriveFolderLink: quickValues.gdriveFolderLink,
+      });
       if (!res.ok) {
         setRowError(res.error);
         return;
       }
       setQuickEditId(null);
+      router.refresh();
+    });
+  }
+
+  function changeStatus(u: UnitRow, status: UnitStatus) {
+    startTransition(async () => {
+      const res = await updateUnitQuickFields(u.id, buildingId, {
+        priceMonth: u.price_month,
+        status,
+        gdriveFolderLink: u.gdrive_folder_link ?? "",
+      });
+      if (!res.ok) {
+        setRowError(res.error);
+        return;
+      }
       router.refresh();
     });
   }
@@ -166,14 +184,18 @@ export function UnitsTable({
                       `${formatPrice(u.price_month)} đ`
                     )}
                   </td>
-                  <td className="px-4 py-3" onClick={(e) => editing && e.stopPropagation()}>
-                    {editing ? (
+                  <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                    {isAdmin ? (
                       <select
-                        value={quickValues.status}
-                        onChange={(e) =>
-                          setQuickValues((v) => ({ ...v, status: e.target.value as UnitStatus }))
-                        }
-                        className="rounded-field border-[1.5px] border-line px-2 py-1 text-sm outline-none focus:border-moss"
+                        value={u.status}
+                        onChange={(e) => changeStatus(u, e.target.value as UnitStatus)}
+                        disabled={pending}
+                        className="rounded-pill border-[1.5px] px-2.5 py-1 font-sans text-xs font-semibold outline-none disabled:opacity-60"
+                        style={{
+                          background: STATUS_STYLES[u.status].bg,
+                          color: STATUS_STYLES[u.status].fg,
+                          borderColor: STATUS_STYLES[u.status].fg,
+                        }}
                       >
                         {UNIT_STATUSES.map((s) => (
                           <option key={s} value={s}>
@@ -214,7 +236,7 @@ export function UnitsTable({
                         {editing ? (
                           <>
                             <button
-                              onClick={() => saveQuickEdit(u.id)}
+                              onClick={() => saveQuickEdit(u)}
                               disabled={pending}
                               className="rounded-field p-1.5 text-moss hover:bg-status-trong-bg"
                               title="Lưu"
