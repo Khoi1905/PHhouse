@@ -21,11 +21,13 @@ export default async function OwnerDetailPage({ params }: { params: Promise<{ id
 
   if (!owner) notFound();
 
+  // Sắp theo thứ tự nhập liệu (created_at tăng dần), không theo quận/huyện —
+  // để cập nhật tòa/phòng không làm xáo trộn thứ tự đã quen mắt của admin.
   const { data: buildings } = await supabase
     .from("buildings")
     .select("id, district, ward, alley, house_number, guide_name, guide_phone, access_type, pinned_at")
     .eq("owner_id", id)
-    .order("district");
+    .order("created_at");
 
   const buildingsWithUnits = await Promise.all(
     (buildings ?? []).map(async (b) => {
