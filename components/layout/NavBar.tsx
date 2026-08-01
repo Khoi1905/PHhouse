@@ -87,6 +87,14 @@ export function NavBar({
           </nav>
         </div>
 
+        <Link
+          href="/top"
+          className="flex items-center gap-1.5 rounded-pill border-[1.5px] border-brand-orange bg-white px-3 py-1.5 text-[13px] font-semibold text-brand-orange lg:hidden"
+        >
+          <Flame size={14} className="fill-brand-orange animate-pulse" />
+          {topUnitsLabel}
+        </Link>
+
         <div className="hidden items-center gap-4 lg:flex">
           {userInfo}
           {logoutButton}
