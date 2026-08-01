@@ -104,3 +104,32 @@ export async function toggleUserActiveAction(
   revalidatePath("/admin/users");
   return { ok: true };
 }
+
+// Xóa vĩnh viễn tài khoản (auth.users) — user_profiles tự mất theo nhờ
+// "on delete cascade". unit_history.changed_by do người này tạo ra sẽ
+// không bị xóa, chỉ chuyển null (xem "on delete set null" trong schema.sql),
+// nên lịch sử đổi giá/tình trạng vẫn còn, chỉ mất tên hiển thị người sửa.
+export async function deleteUserAction(userId: string): Promise<ActionResult> {
+  const caller = await requireAdmin();
+  if (!caller) return { ok: false, error: "Không có quyền thực hiện." };
+
+  const parsed = z.string().uuid().safeParse(userId);
+  if (!parsed.success) return { ok: false, error: "Dữ liệu tài khoản không hợp lệ." };
+
+  if (parsed.data === caller.id) {
+    return { ok: false, error: "Không thể tự xóa tài khoản của chính mình." };
+  }
+
+  let admin: ReturnType<typeof createAdminClient>;
+  try {
+    admin = createAdminClient();
+  } catch {
+    return { ok: false, error: "Hệ thống chưa cấu hình Supabase service role." };
+  }
+
+  const { error } = await admin.auth.admin.deleteUser(parsed.data);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/users");
+  return { ok: true };
+}

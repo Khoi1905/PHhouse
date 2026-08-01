@@ -2,11 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, LockOpen, Plus } from "lucide-react";
-import { Modal, Button } from "@/components/ui";
+import { Lock, LockOpen, Plus, Trash2 } from "lucide-react";
+import { Modal, Button, ConfirmDialog } from "@/components/ui";
 import { CreateUserForm } from "./CreateUserForm";
 import type { CreateUserValues } from "@/lib/validation";
-import { createUserAction, toggleUserActiveAction } from "@/app/(app)/admin/users/actions";
+import {
+  createUserAction,
+  toggleUserActiveAction,
+  deleteUserAction,
+} from "@/app/(app)/admin/users/actions";
 
 export type UserRow = {
   id: string;
@@ -20,10 +24,12 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
   const router = useRouter();
   const [createOpen, setCreateOpen] = useState(false);
   const [confirmTarget, setConfirmTarget] = useState<UserRow | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<UserRow | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [createPending, setCreatePending] = useState(false);
   const [togglePending, setTogglePending] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
 
   function closeCreate() {
     if (!createPending) setCreateOpen(false);
@@ -72,6 +78,25 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
       return;
     }
     void runToggle(u);
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setActionError(null);
+    setDeletePending(true);
+    try {
+      const res = await deleteUserAction(deleteTarget.id);
+      if (!res.ok) {
+        setActionError(res.error);
+        return;
+      }
+      setDeleteTarget(null);
+      router.refresh();
+    } catch {
+      setActionError("Không thể xóa tài khoản. Vui lòng thử lại.");
+    } finally {
+      setDeletePending(false);
+    }
   }
 
   return (
@@ -139,7 +164,7 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-1">
                       <button
                         type="button"
                         onClick={() => requestToggle(u)}
@@ -149,6 +174,16 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
                         aria-label={actionLabel}
                       >
                         {u.is_active ? <Lock size={15} /> : <LockOpen size={15} />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeleteTarget(u)}
+                        disabled={isCurrentUser}
+                        className="flex items-center gap-1.5 rounded-field p-1.5 text-muted-2 hover:bg-danger-bg hover:text-danger-fg disabled:cursor-not-allowed disabled:opacity-40"
+                        title={isCurrentUser ? "Không thể tự xóa tài khoản hiện tại" : `Xóa tài khoản ${u.email}`}
+                        aria-label={isCurrentUser ? "Không thể tự xóa tài khoản hiện tại" : `Xóa tài khoản ${u.email}`}
+                      >
+                        <Trash2 size={15} />
                       </button>
                     </div>
                   </td>
@@ -196,6 +231,15 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
           </Button>
         </div>
       </Modal>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Xóa tài khoản vĩnh viễn"
+        description={`Tài khoản "${deleteTarget?.email}" sẽ bị xóa vĩnh viễn, không thể khôi phục. Lịch sử đổi giá/tình trạng do người này thực hiện vẫn được giữ lại nhưng mất tên hiển thị.`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+        pending={deletePending}
+      />
     </div>
   );
 }
