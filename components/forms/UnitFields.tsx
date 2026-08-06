@@ -2,9 +2,16 @@
 
 import { useFormContext, Controller } from "react-hook-form";
 import { Link as LinkIcon } from "lucide-react";
-import { Field, TextInput, Textarea, StatusPicker, MultiSelectDropdown } from "@/components/ui";
+import {
+  Field,
+  TextInput,
+  Textarea,
+  StatusPicker,
+  MultiSelectDropdown,
+  PriceInput,
+  TEXT_INPUT_CLASS,
+} from "@/components/ui";
 import { UNIT_TYPES } from "@/lib/constants";
-import { vndToTrieuStr, trieuStrToVnd } from "@/lib/format";
 import type { WizardFormValues } from "@/lib/validation";
 
 export function UnitFields() {
@@ -39,13 +46,11 @@ export function UnitFields() {
             control={control}
             name="priceMonth"
             render={({ field }) => (
-              <TextInput
-                type="number"
-                step="0.1"
-                min={0}
+              <PriceInput
+                className={TEXT_INPUT_CLASS}
                 placeholder="7.5"
-                value={vndToTrieuStr(field.value)}
-                onChange={(e) => field.onChange(trieuStrToVnd(e.target.value) ?? undefined)}
+                valueVnd={field.value ?? null}
+                onChangeVnd={(vnd) => field.onChange(vnd ?? undefined)}
               />
             )}
           />

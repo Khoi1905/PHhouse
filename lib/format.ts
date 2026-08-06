@@ -29,9 +29,13 @@ export function vndToTrieuStr(raw: string | number | null | undefined): string {
   return String(trieu);
 }
 
+// Chấp nhận cả "5.6" và "5,6": bàn phím số trên điện thoại ở VN đưa ra dấu
+// PHẨY, nên người nhập gần như luôn gõ dấu phẩy. Trả null khi chưa parse được
+// (chuỗi rỗng, còn dở dang, hoặc có ký tự lạ) — nơi gọi tự quyết định xử lý.
 export function trieuStrToVnd(trieuStr: string): number | null {
-  const trieu = Number(trieuStr);
-  if (!trieuStr.trim() || !Number.isFinite(trieu)) return null;
+  const normalized = trieuStr.trim().replace(/,/g, ".");
+  const trieu = Number(normalized);
+  if (!normalized || !Number.isFinite(trieu)) return null;
   return Math.round(trieu * 1_000_000);
 }
 

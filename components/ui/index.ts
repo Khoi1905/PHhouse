@@ -1,5 +1,6 @@
 export { Field } from "./Field";
-export { TextInput } from "./TextInput";
+export { TextInput, TEXT_INPUT_CLASS } from "./TextInput";
+export { PriceInput } from "./PriceInput";
 export { LockedInput } from "./LockedInput";
 export { Textarea } from "./Textarea";
 export { Select } from "./Select";

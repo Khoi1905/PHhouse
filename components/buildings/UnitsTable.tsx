@@ -4,10 +4,10 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { Check, ExternalLink, Flame, History, Pencil, Plus, SquarePen, Star, Trash2, X } from "lucide-react";
-import { Button, ConfirmDialog, Modal, SlideOver, StatusPill } from "@/components/ui";
+import { Button, ConfirmDialog, Modal, PriceInput, SlideOver, StatusPill } from "@/components/ui";
 import { UnitFields } from "@/components/forms/UnitFields";
 import { STATUS_STYLES, UNIT_STATUSES, type UnitStatus } from "@/lib/constants";
-import { formatPrice, vndToTrieuStr, trieuStrToVnd } from "@/lib/format";
+import { formatPrice } from "@/lib/format";
 import { useUrlParamState } from "@/lib/hooks/useUrlParamState";
 import { unitStepSchema, type WizardFormValues } from "@/lib/validation";
 import {
@@ -41,7 +41,12 @@ export function UnitsTable({
 }) {
   const router = useRouter();
   const [quickEditId, setQuickEditId] = useState<string | null>(null);
-  const [quickValues, setQuickValues] = useState({ priceMonth: 0, gdriveFolderLink: "" });
+  // priceMonth có thể null khi người dùng đang gõ dở ("5.") hoặc xóa trắng ô —
+  // cố ý KHÔNG ép về 0, vì ép về 0 chính là thứ ghi đè lại ô đang gõ.
+  const [quickValues, setQuickValues] = useState<{
+    priceMonth: number | null;
+    gdriveFolderLink: string;
+  }>({ priceMonth: null, gdriveFolderLink: "" });
   const { value: openUnitId, open: openUnit, close: closeUnit } = useUrlParamState("unit");
   const slideOverUnit = units.find((u) => u.id === openUnitId) ?? null;
   const [fullEditUnit, setFullEditUnit] = useState<UnitRow | null>(null);
@@ -59,9 +64,14 @@ export function UnitsTable({
   }
 
   function saveQuickEdit(u: UnitRow) {
+    const price = quickValues.priceMonth;
+    if (price === null || price <= 0) {
+      setRowError("Giá thuê phải là số lớn hơn 0 (đơn vị: triệu đồng).");
+      return;
+    }
     startTransition(async () => {
       const res = await updateUnitQuickFields(u.id, buildingId, {
-        priceMonth: quickValues.priceMonth,
+        priceMonth: price,
         status: u.status,
         gdriveFolderLink: quickValues.gdriveFolderLink,
       });
@@ -170,13 +180,9 @@ export function UnitsTable({
                   <td className="px-4 py-3 text-ink">{u.unit_type.join(", ")}</td>
                   <td className="px-4 py-3 text-ink" onClick={(e) => editing && e.stopPropagation()}>
                     {editing ? (
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={vndToTrieuStr(quickValues.priceMonth)}
-                        onChange={(e) =>
-                          setQuickValues((v) => ({ ...v, priceMonth: trieuStrToVnd(e.target.value) ?? 0 }))
-                        }
+                      <PriceInput
+                        valueVnd={quickValues.priceMonth}
+                        onChangeVnd={(vnd) => setQuickValues((v) => ({ ...v, priceMonth: vnd }))}
                         placeholder="7.5"
                         className="w-28 rounded-field border-[1.5px] border-line px-2 py-1 text-sm outline-none focus:border-moss"
                       />
