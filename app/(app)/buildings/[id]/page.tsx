@@ -37,6 +37,7 @@ export default async function BuildingDetailPage({ params }: { params: Promise<{
         pinnedAt: data.pinned_at,
         ownerCode: owner?.owner_code ?? "—",
         ownerName: owner?.full_name,
+        ownerId: data.owner_id,
         commissionSalePct: owner?.commission_sale_pct,
         commissionTotalPct: owner?.commission_total_pct,
       };

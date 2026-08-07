@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Lock, Pencil, Trash2, Building2, Star } from "lucide-react";
+import { Lock, Pencil, Trash2, Building2, Star, Plus } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Button, Modal, ConfirmDialog } from "@/components/ui";
 import { BuildingFields } from "@/components/forms/BuildingFields";
@@ -22,6 +23,10 @@ export type BuildingHeaderData = {
   pinnedAt?: string | null;
   ownerCode: string;
   ownerName?: string;
+  // Chỉ truyền từ trang chi tiết tòa nhà. Trang chủ sở hữu cố ý KHÔNG truyền:
+  // ở đó đã có sẵn nút "Thêm tòa nhà mới" ở đầu trang, truyền vào sẽ lặp nút
+  // trên từng thẻ tòa nhà.
+  ownerId?: string;
   commissionSalePct?: number | null;
   commissionTotalPct?: number | null;
 };
@@ -134,7 +139,19 @@ export function BuildingHeader({ data, isAdmin }: { data: BuildingHeaderData; is
         </div>
 
         {isAdmin && (
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {data.ownerId && (
+              // Tái dùng đúng luồng của trang chủ sở hữu: wizard đọc 2 tham số
+              // này rồi bỏ qua bước chọn chủ, nhảy thẳng vào bước Tòa nhà.
+              <Link
+                href={`/admin/new-entry?ownerId=${data.ownerId}&ownerLabel=${encodeURIComponent(
+                  data.ownerName ? `${data.ownerCode} — ${data.ownerName}` : data.ownerCode
+                )}`}
+                className="inline-flex items-center gap-1.5 rounded-[9px] border-[1.5px] border-line px-[18px] py-2.5 font-sans text-[13.5px] font-semibold text-muted-2 transition-opacity hover:opacity-90"
+              >
+                <Plus size={14} /> Thêm tòa cùng chủ
+              </Link>
+            )}
             <Button variant="ghost" onClick={togglePin} disabled={pending}>
               <Star size={14} className={isPinned ? "fill-brand-orange text-brand-orange" : ""} />
               {isPinned ? "Bỏ ghim" : "Ghim tòa nhà"}
