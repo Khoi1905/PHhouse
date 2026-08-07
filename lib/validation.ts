@@ -127,7 +127,9 @@ export type WizardFormValues = {
   buildingNote?: string;
   roomNumber?: string;
   unitTypes?: UnitType[];
-  priceMonth?: number;
+  // null = ô giá đang trống/chưa hợp lệ. Cố ý dùng null thay vì undefined —
+  // xem chú thích ở UnitFields.tsx (undefined làm RHF dựng lại giá mặc định).
+  priceMonth?: number | null;
   status: UnitStatus;
   detailsText?: string;
   gdriveFolderLink?: string;

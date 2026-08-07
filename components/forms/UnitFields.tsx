@@ -50,7 +50,13 @@ export function UnitFields() {
                 className={TEXT_INPUT_CLASS}
                 placeholder="7.5"
                 valueVnd={field.value ?? null}
-                onChangeVnd={(vnd) => field.onChange(vnd ?? undefined)}
+                // PHẢI là null, không được undefined: react-hook-form đọc giá trị
+                // bằng get(_formValues, name, get(_defaultValues, name)) — hàm get
+                // này rơi về giá trị MẶC ĐỊNH khi gặp undefined. Ở màn Sửa đầy đủ
+                // mặc định là giá cũ của phòng, nên xóa trắng ô sẽ bị dựng lại giá
+                // cũ ngay lập tức. null thì get trả về đúng null, không rơi về mặc
+                // định. (Màn tạo phòng không lộ lỗi này vì nó không có mặc định.)
+                onChangeVnd={(vnd) => field.onChange(vnd)}
               />
             )}
           />
